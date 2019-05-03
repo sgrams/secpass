@@ -28,7 +28,6 @@ set_property (TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME}
   Qt5::Core
   Qt5::Widgets
-  Qt5::Svg
 )
 
 set (INSTALL_DEFAULT_BINDIR "bin" CACHE STRING "Appended to CMAKE_INSTALL_PREFIX")
