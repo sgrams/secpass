@@ -75,3 +75,7 @@ Thumbs.db
 
 # Build dir
 build/
+
+# Docs apart from doxygen config
+docs/*
+!docs/secpass.doxy
