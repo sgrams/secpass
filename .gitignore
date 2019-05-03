@@ -73,8 +73,11 @@ Thumbs.db
 *.dll
 *.exe
 
-# Build dir
-build/
+# Build apart from build scripts
+build/*
+!build/build.sh
+!build/build-nc.sh
+!build/build-qt.sh
 
 # Docs apart from doxygen config
 docs/*
