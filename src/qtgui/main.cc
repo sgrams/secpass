@@ -7,6 +7,15 @@
 #include <QApplication>
 #include "mainwindow.h"
 
+/*!
+ * Main function
+ * @param  int  argc
+ * @param  char *argv[]
+ * @retval int
+ *
+ * @author Stanisław Grams
+ * @date   2019/05/03
+ */
 int
 main (int argc, char *argv[])
 {

@@ -17,8 +17,9 @@ void print_help ();
 
 /*!
  * Main function
- * @param int  argc
- * @param char *argv[]
+ * @param  int  argc
+ * @param  char *argv[]
+ * @retval int  status
  *
  * @author Stanisław Grams
  * @date   2019/05/03

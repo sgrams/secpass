@@ -7,14 +7,28 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-  QMainWindow(parent),
-  ui(new Ui::MainWindow)
+/*!
+ * MainWindow constructor
+ * @param  QWidget *parent
+ * @retval MainWindow
+ *
+ * @author Stanisław Grams
+ * @date   2019/05/03
+ */
+MainWindow::MainWindow (QWidget *parent) :
+  QMainWindow (parent),
+  ui (new Ui::MainWindow)
 {
-  ui->setupUi(this);
+  ui->setupUi (this);
 }
 
-MainWindow::~MainWindow()
+/*!
+ * MainWindow destructor
+ *
+ * @author Stanisław Grams
+ * @date   2019/05/03
+ */
+MainWindow::~MainWindow ()
 {
   delete ui;
 }
