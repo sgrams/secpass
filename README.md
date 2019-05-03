@@ -1,5 +1,5 @@
 # secpass: password manager powered by Intel® SGX
-secpass is a password manager being created for people who value their privacy.
+secpass is a password manager being created for people who value their privacy. \
 By utilizing Intel® Software Guard Extensions, secpass is meant to protect your passwords
 and notes in secret memory enclaves – hence "sec" in secpass.
 
@@ -9,6 +9,7 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 ## prerequisites
 - [Intel® SGX SDK](https://github.com/intel/linux-sgx)
 - Qt5
+- ncurses
 - CMake
 - GCC *or* Clang
 

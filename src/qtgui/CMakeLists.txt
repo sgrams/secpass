@@ -4,13 +4,13 @@
 ##
 ## secpass-git
 ##
-# add src files to SRC_LIST
-add_src_files (SRC_LIST
+# add src files to QT_SRC_LIST
+add_src_files (QT_SRC_LIST
   main.cc
   mainwindow.cc
   mainwindow.h
   )
-
-add_src_files (UI_SRC_LIST
+# add src files to QT_UI_SRC_LIST
+add_src_files (QT_UI_SRC_LIST
   mainwindow.ui
   )
