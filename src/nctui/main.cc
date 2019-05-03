@@ -36,12 +36,12 @@ void
 print_help ()
 {
   std::cout <<
-    "secpass-nc " + SECPASS_VERSION + "\n" +
-    "Usage: secpass-nc /path/to/dbfile [OPTIONS]\n" +
-    "Options:\n" +
-    "  -e\tExport secdb to kdbx file (requires path)" +
-    "  -i\tImport secdb from kdbx file (requires path)" +
-    "  -t\tLock interface after given timeout in s" +
+    "secpass-nc " << SECPASS_VERSION "\n" <<
+    "Usage: secpass-nc /path/to/dbfile [OPTIONS]\n"     <<
+    "Options:\n" <<
+    "  -e\tExport secdb to kdbx file (requires path)"   <<
+    "  -i\tImport secdb from kdbx file (requires path)" <<
+    "  -t\tLock interface after given timeout in s"     <<
     "\n";
 
   return;
