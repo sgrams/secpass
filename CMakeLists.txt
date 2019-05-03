@@ -5,11 +5,7 @@
 cmake_minimum_required (VERSION 2.8.11)
 project (secpass)
 
-add_definitions (-DVERSION="${GITVERSION}")
 set (PACKAGE ${PROJECT_NAME})
-
-find_package (PkgConfig REQUIRED)
-find_package (Qt5 COMPONENTS Core Network Widgets Svg REQUIRED)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
     add_definitions (-Wall)
@@ -41,7 +37,6 @@ function (add_src_files list)
     # append to global list
     set_property (GLOBAL APPEND PROPERTY ${list} "${SRC}")
 endfunction (add_src_files)
-
 
 add_subdirectory (src)
 #add_subdirectory (test)
