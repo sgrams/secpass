@@ -1,6 +1,11 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
+/* src/qtgui/mainwindow.h
+ * Stanisław Grams <sgrams@fmdx.pl>
+ *
+ * secpass.org
+ * © 2019
+ */
+#ifndef _SECPASS_MAINWINDOW_H
+#define _SECPASS_MAINWINDOW_H
 #include <QMainWindow>
 
 namespace Ui {
@@ -19,4 +24,4 @@ private:
   Ui::MainWindow *ui;
 };
 
-#endif // MAINWINDOW_H
+#endif // _SECPASS_MAINWINDOW_H

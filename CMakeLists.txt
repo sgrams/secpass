@@ -1,7 +1,8 @@
-##
-## Stanisław Grams <sgrams@fmdx.pl>
 ## CMakeLists.txt
+## Stanisław Grams <sgrams@fmdx.pl>
 ##
+## secpass.org
+## © 2019
 cmake_minimum_required (VERSION 2.8.11)
 project (secpass)
 

@@ -1,11 +1,18 @@
-#include "mainwindow.h"
+/* src/qtgui/main.cc
+ * Stanisław Grams <sgrams@fmdx.pl>
+ *
+ * secpass.org
+ * © 2019
+ */
 #include <QApplication>
+#include "mainwindow.h"
 
-int main(int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
-  QApplication a(argc, argv);
+  QApplication a (argc, argv);
   MainWindow w;
-  w.show();
+  w.show ();
 
-  return a.exec();
+  return a.exec ();
 }

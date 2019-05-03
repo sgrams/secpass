@@ -1,9 +1,8 @@
-##
-## Stanisław Grams <sgrams@fmdx.pl>
 ## src/CMakeLists.txt
+## Stanisław Grams <sgrams@fmdx.pl>
 ##
-## secpass-git
-##
+## secpass.org
+## © 2019
 # add src subdirs
 add_subdirectory (qtgui)
 add_subdirectory (nctui)

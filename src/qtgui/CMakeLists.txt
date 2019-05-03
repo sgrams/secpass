@@ -1,9 +1,8 @@
-##
-## Stanisław Grams <sgrams@fmdx.pl>
 ## src/qtgui/CMakeLists.txt
+## Stanisław Grams <sgrams@fmdx.pl>
 ##
-## secpass-git
-##
+## secpass.org
+## © 2019
 # add src files to QT_SRC_LIST
 add_src_files (QT_SRC_LIST
   main.cc
