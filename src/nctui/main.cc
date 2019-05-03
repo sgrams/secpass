@@ -5,6 +5,11 @@
  * © 2019
  */
 #include <iostream>
+
+#include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
+
 #include "../common/secpass.h"
 
 // prototypes
@@ -21,7 +26,14 @@ void print_help ();
 int
 main (int argc, char *argv[])
 {
-  return EXIT_SUCCESS;
+  int status = 0;
+
+  if (argc < 2) {
+    print_help ();
+    return status;
+  }
+
+  return status;
 }
 
 /*!
@@ -36,13 +48,12 @@ void
 print_help ()
 {
   std::cout <<
-    "secpass-nc " << SECPASS_VERSION "\n" <<
+    "secpass-nc " << SECPASS_VERSION << " © " << SECPASS_AUTHORS << "\n" <<
     "Usage: secpass-nc /path/to/dbfile [OPTIONS]\n"     <<
     "Options:\n" <<
-    "  -e\tExport secdb to kdbx file (requires path)"   <<
-    "  -i\tImport secdb from kdbx file (requires path)" <<
-    "  -t\tLock interface after given timeout in s"     <<
-    "\n";
+    "  -e\tExport secdb to kdbx file (requires path)\n"   <<
+    "  -i\tImport secdb from kdbx file (requires path)\n" <<
+    "  -t\tLock interface after given timeout in s\n";
 
   return;
 }
