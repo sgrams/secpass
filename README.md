@@ -12,6 +12,7 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 - OpenSSL
 - CMake
 - GCC *or* Clang
+
 ### GUI/TUI
 - qt5 *OR* ncurses
 
