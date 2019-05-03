@@ -7,27 +7,38 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 [![Build Status](https://travis-ci.org/sgrams/secpass.svg?branch=master)](https://travis-ci.org/sgrams/secpass)
 
 ## prerequisites
+### common
 - [Intel® SGX SDK](https://github.com/intel/linux-sgx)
-- Qt5
-- ncurses
+- OpenSSL
 - CMake
 - GCC *or* Clang
+### GUI/TUI
+- qt5 *OR* ncurses
 
 ## building secpass from source
 ```
-# git clone https://github.com/sgrams/secpass.git
-# cd secpass/
-# mkdir build
-# cd build && cmake ..
-# make
+$ git clone https://github.com/sgrams/secpass.git
+$ cd secpass/build/
 ```
-### running secpass with Qt5 GUI
+In order to build all targets (both ncurses and Qt front-end) please run
 ```
-# ./secpass-qt
+$ ./build.sh    # for all available targets
+$ ./build-nc.sh # for ncurses target
+$ ./build-qt.sh # for qt5 target
+````
+Run with
 ```
-### running secpass with ncurses TUI
+$ ./secpass-nc # for ncurses TUI
+$ ./secpass-qt # for qt5 GUI
 ```
-# ./secpass-nc
+
+## documentation
+Documentation is available under [docs.secpass.org](https://docs.secpass.org/) and is dynamically
+generated with Doxygen.
+
+In order to generate docs please run
+```
+$ cd docs/ && doxygen secpass.doxy
 ```
 
 ## MIT License
