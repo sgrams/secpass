@@ -7,32 +7,35 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 
 ## build status
 [![Build Status](https://travis-ci.org/sgrams/secpass.svg?branch=master)](https://travis-ci.org/sgrams/secpass)
-
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/496080b6ae604018bbb243206e4f5433)](https://app.codacy.com/app/sgrams/secpass?utm_source=github.com&utm_medium=referral&utm_content=sgrams/secpass&utm_campaign=Badge_Grade_Dashboard)
 ## prerequisites
 ### common
-- [Intel® SGX SDK](https://github.com/intel/linux-sgx)
-- OpenSSL
-- CMake
-- GCC *or* Clang
+  - [Intel® SGX SDK](https://github.com/intel/linux-sgx)
+  - OpenSSL
+  - CMake
+  - GCC *or* Clang
 
 ### GUI/TUI
-- qt5 *OR* ncurses
+  - qt5 *OR* ncurses
 
 ## building secpass from source
 ```
 $ git clone https://github.com/sgrams/secpass.git
 $ cd secpass/build/
 ```
+
 In order to build all targets (both ncurses and Qt front-end) please run
 ```
 $ ./build.sh    # for all available targets
 $ ./build-nc.sh # for ncurses target
 $ ./build-qt.sh # for qt5 target
 ````
+
 Run with
 ```
 $ ./secpass-nc # for ncurses TUI
 $ ./secpass-qt # for qt5 GUI
+
 ```
 
 ## documentation
