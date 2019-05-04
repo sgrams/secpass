@@ -10,13 +10,13 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/496080b6ae604018bbb243206e4f5433)](https://app.codacy.com/app/sgrams/secpass?utm_source=github.com&utm_medium=referral&utm_content=sgrams/secpass&utm_campaign=Badge_Grade_Dashboard)
 ## prerequisites
 ### common
-  - [Intel® SGX SDK](https://github.com/intel/linux-sgx)
-  - OpenSSL
-  - CMake
-  - GCC *or* Clang
+- [Intel® SGX SDK](https://github.com/intel/linux-sgx)
+- OpenSSL
+- CMake
+- GCC *or* Clang
 
 ### GUI/TUI
-  - qt5 *OR* ncurses
+- qt5 *OR* ncurses
 
 ## building secpass from source
 ```
