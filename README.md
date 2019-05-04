@@ -12,7 +12,7 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 ## prerequisites
 ### common
 - [Intel® SGX SDK](https://github.com/intel/linux-sgx)
-- [OpenSSL](https://github.com/openssl/openssl)]
+- [OpenSSL](https://github.com/openssl/openssl)
 - CMake
 - GCC *or* Clang
 
