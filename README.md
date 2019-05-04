@@ -12,7 +12,7 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 ## prerequisites
 ### common
 - [Intel® SGX SDK](https://github.com/intel/linux-sgx)
-- OpenSSL
+- [OpenSSL](https://github.com/openssl/openssl)]
 - CMake
 - GCC *or* Clang
 
@@ -36,7 +36,6 @@ Run with
 ```
 $ ./secpass-nc # for ncurses TUI
 $ ./secpass-qt # for qt5 GUI
-
 ```
 
 ## documentation
