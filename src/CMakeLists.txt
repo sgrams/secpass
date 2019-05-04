@@ -7,6 +7,26 @@
 add_subdirectory (qtgui)
 add_subdirectory (nctui)
 
+# SGX related settings and checks
+enable_language (ASM)
+if (NOT DEFINED ENV{SGX_SDK})
+  message (FATAL_ERROR "$SGX_SDK environment variable must be set up.")
+endif ()
+
+
+if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+  set (CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH} $ENV{SGX_SDK}/lib")
+  set (SGX_ENCLAVE_SIGNER "$ENV{SGX_SDK}/bin/x86/sgx_sign")
+  set (SGX_EDGER8R "$ENV{SGX_SDK}/bin/x86/sgx_edger8r")
+else ()
+  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
+  set (CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "$ENV{SGX_SDK}/lib64")
+  set (SGX_ENCLAVE_SIGNER "$ENV{SGX_SDK}/bin/x64/sgx_sign")
+  set (SGX_EDGER8R "$ENV{SGX_SDK}/bin/x64/sgx_edger8r")
+endif ()
+
+
 # set and check qt
 find_package (Qt5 COMPONENTS Core Network Widgets Svg)
 get_property (${PROJECT_NAME}_QT_SRC GLOBAL PROPERTY QT_SRC_LIST)
