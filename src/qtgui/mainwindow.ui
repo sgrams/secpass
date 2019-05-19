@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>563</width>
-    <height>381</height>
+    <width>594</width>
+    <height>521</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>200</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -16,20 +22,35 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
-     <widget class="QWidget" name="gridWidget" native="true">
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QListView" name="listView"/>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QColumnView" name="columnView"/>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="1">
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>284</width>
+           <height>432</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QTableView" name="tableView">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -38,7 +59,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>563</width>
+     <width>594</width>
      <height>18</height>
     </rect>
    </property>
@@ -46,7 +67,7 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionFile"/>
+    <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
@@ -60,9 +81,8 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionAdd_entry"/>
-    <addaction name="actionEdit_entry"/>
-    <addaction name="actionRemove_selected"/>
+    <addaction name="actionAddEntry"/>
+    <addaction name="actionRemoveEntry"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -74,25 +94,59 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="separator"/>
+    <addaction name="actionHomepage"/>
+    <addaction name="separator"/>
+    <addaction name="actionAboutQt"/>
     <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
    </widget>
    <addaction name="menusecpass"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNew"/>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
+   <addaction name="actionClose"/>
+   <addaction name="separator"/>
+   <addaction name="actionAddEntry"/>
+   <addaction name="actionRemoveEntry"/>
+   <addaction name="separator"/>
+   <addaction name="actionSettings"/>
+   <addaction name="separator"/>
+   <addaction name="actionToggleLock"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionFile">
+  <action name="actionNew">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/document.svg</normaloff>:/icons/document.svg</iconset>
+   </property>
    <property name="text">
     <string>New</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionAbout">
@@ -104,6 +158,10 @@
    </property>
   </action>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/folder.svg</normaloff>:/icons/folder.svg</iconset>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
@@ -112,6 +170,10 @@
    </property>
   </action>
   <action name="actionClose">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/x.svg</normaloff>:/icons/x.svg</iconset>
+   </property>
    <property name="text">
     <string>Close</string>
    </property>
@@ -128,6 +190,10 @@
    </property>
   </action>
   <action name="actionSave">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/arrow-circle-bottom.svg</normaloff>:/icons/arrow-circle-bottom.svg</iconset>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
@@ -136,6 +202,10 @@
    </property>
   </action>
   <action name="actionSaveAs">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/collapse-down.svg</normaloff>:/icons/collapse-down.svg</iconset>
+   </property>
    <property name="text">
     <string>Save as</string>
    </property>
@@ -144,37 +214,90 @@
    </property>
   </action>
   <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/cog.svg</normaloff>:/icons/cog.svg</iconset>
+   </property>
    <property name="text">
     <string>Settings</string>
    </property>
   </action>
-  <action name="actionAdd_entry">
+  <action name="actionAddEntry">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/plus.svg</normaloff>:/icons/plus.svg</iconset>
+   </property>
    <property name="text">
     <string>Add entry</string>
    </property>
   </action>
-  <action name="actionRemove_selected">
-   <property name="text">
-    <string>Remove selected</string>
+  <action name="actionRemoveEntry">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/minus.svg</normaloff>:/icons/minus.svg</iconset>
    </property>
-  </action>
-  <action name="actionEdit_entry">
    <property name="text">
-    <string>Edit entry</string>
-   </property>
-  </action>
-  <action name="actionSend_to_Firefox">
-   <property name="text">
-    <string>Send to Firefox</string>
+    <string>Remove entry</string>
    </property>
   </action>
   <action name="actionExport">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/share-boxed.svg</normaloff>:/icons/share-boxed.svg</iconset>
+   </property>
    <property name="text">
     <string>Export</string>
    </property>
   </action>
+  <action name="actionToggleLock">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/lock-locked.svg</normaloff>
+     <normalon>:/icons/lock-unlocked.svg</normalon>:/icons/lock-locked.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Lock</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle lock the database</string>
+   </property>
+  </action>
+  <action name="actionAboutQt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionHomepage">
+   <property name="icon">
+    <iconset resource="../../assets/icons.qrc">
+     <normaloff>:/icons/globe.svg</normaloff>:/icons/globe.svg</iconset>
+   </property>
+   <property name="text">
+    <string>secpass Homepage</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
- <connections/>
+ <resources>
+  <include location="../../assets/icons.qrc"/>
+  <include location="../../assets/logo.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>297</x>
+     <y>304</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
