@@ -6,7 +6,7 @@ By utilizing Intel® Software Guard Extensions, secpass is meant to protect your
 and notes in secret memory enclaves – hence "sec" in secpass.
 
 ## Build status
-[![Travis Badge](https://travis-ci.org/sgrams/secpass.svg?branch=master)](https://travis-ci.org/sgrams/secpass)
+[![CircleCI](https://circleci.com/gh/sgrams/secpass/tree/master.svg?style=svg)](https://circleci.com/gh/sgrams/secpass/tree/master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/496080b6ae604018bbb243206e4f5433)](https://app.codacy.com/app/sgrams/secpass?utm_source=github.com&utm_medium=referral&utm_content=sgrams/secpass&utm_campaign=Badge_Grade_Dashboard)
 ![License Badge](https://img.shields.io/github/license/sgrams/secpass.svg?color=red)
 ## Prerequisites
