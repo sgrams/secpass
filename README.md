@@ -1,5 +1,5 @@
 # secpass: password manager powered by Intel® SGX
-<img style="text-center;" src="https://raw.githubusercontent.com/sgrams/secpass/master/assets/logo.png" alt="logo" width="100"/>
+<img style="text-center;" src="https://raw.githubusercontent.com/sgrams/secpass/master/assets/logo/logo.png" alt="logo" width="100"/>
 
 *secpass* is a password manager being created for people who value their privacy. \
 By utilizing Intel® Software Guard Extensions, secpass is meant to protect your passwords
