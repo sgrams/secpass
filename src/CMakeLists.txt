@@ -37,9 +37,10 @@ QT5_WRAP_UI (QT_UIS_HDRS
   ${${PROJECT_NAME}_QT_UI_SRC}
   )
 # process qtgui resources
-#QT5_ADD_RESOURCES (ASSETS_LIST
-#  ../assets/file1.qrc
-#  )
+QT5_ADD_RESOURCES (ASSETS_LIST
+  ../assets/icons.qrc
+  ../assets/logo.qrc
+  )
 
 # if set and check nc properties
 set (CURSES_NEED_NCURSES TRUE)
@@ -48,7 +49,7 @@ get_property (${PROJECT_NAME}_NC_SRC GLOBAL PROPERTY NC_SRC_LIST)
 
 # build program
 ## qt gui
-add_executable (${PROJECT_NAME}-qt ${${PROJECT_NAME}_QT_SRC} ${QT_UIS_HDRS})
+add_executable (${PROJECT_NAME}-qt ${${PROJECT_NAME}_QT_SRC} ${QT_UIS_HDRS} ${ASSETS_LIST})
 set_property (TARGET ${PROJECT_NAME}-qt PROPERTY CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME}-qt
   Qt5::Core
