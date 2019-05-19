@@ -1,0 +1,24 @@
+<RCC>
+  <qresource prefix="/">
+    <file>icons/envelope-open.svg</file>
+    <file>icons/envelope-closed.svg</file>
+    <file>icons/cog.svg</file>
+    <file>icons/plus.svg</file>
+    <file>icons/minus.svg</file>
+    <file>icons/document.svg</file>
+    <file>icons/lock-locked.svg</file>
+    <file>icons/lock-unlocked.svg</file>
+    <file>icons/pencil.svg</file>
+    <file>icons/share-boxed.svg</file>
+    <file>icons/text.svg</file>
+    <file>icons/folder.svg</file>
+    <file>icons/globe.svg</file>
+    <file>icons/key.svg</file>
+    <file>icons/warning.svg</file>
+    <file>icons/trash.svg</file>
+    <file>icons/x.svg</file>
+    <file>icons/info.svg</file>
+    <file>icons/arrow-circle-bottom.svg</file>
+    <file>icons/collapse-down.svg</file>
+  </qresource>
+</RCC>
