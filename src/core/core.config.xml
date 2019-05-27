@@ -1,3 +1,11 @@
+<!-- src/core/core.config.xml
+     Stanisław Grams <sjg@fmdx.pl>
+
+     Contains the configuration of core enclave.
+
+     secpass.org
+     ® 2019
+-->
 <EnclaveConfiguration>
   <ISVSVN>0</ISVSVN>
   <ProdID>0</ProdID>
@@ -7,5 +15,6 @@
   <TCSNum>1</TCSNum>
   <MiscSelect>0</MiscSelect>
   <MiscMask>0xFFFFFFFF</MiscMask>
+  <!-- Disable debug to build enclave in a production mode-->
   <DisableDebug>0</DisableDebug>
 </EnclaveConfiguration>
