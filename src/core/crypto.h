@@ -1,4 +1,4 @@
-/* src/core/crypto.hh
+/* src/core/crypto.h
  * Stanisław Grams <sgrams@fmdx.pl>
  *
  * secpass.org
@@ -25,6 +25,5 @@ class Crypto {
   Crypto ();
   ~Crypto ();
 
-  crypto_status_t
 };
 #endif // _SECPASS_CORE_CRYPTO_H

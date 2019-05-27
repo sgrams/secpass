@@ -4,7 +4,8 @@
  * secpass.org
  * © 2019
  */
-#include <cstdint>
+#include <sgx.h>
 #include <sgx_tcrypto.h>
 
 #include "crypto.hh"
+
