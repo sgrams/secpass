@@ -1,0 +1,9 @@
+enclave {
+  trusted {
+    /* ECALLs */
+    public int entry_add ();
+  };
+  untrusted {
+    /* OCALLs */
+  };
+};
