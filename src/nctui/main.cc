@@ -50,7 +50,7 @@ print_help ()
 {
   std::cout <<
     "secpass-nc " << SECPASS_VERSION << " © " << SECPASS_AUTHORS << "\n" <<
-    "Usage: secpass-nc /path/to/dbfile [OPTIONS]\n"     <<
+    "Usage: secpass-nc /path/to/dbfile [OPTIONS] /path/to/file\n"     <<
     "Options:\n" <<
     "  -e\tExport secdb to kdbx file (requires path)\n"   <<
     "  -i\tImport secdb from kdbx file (requires path)\n" <<
