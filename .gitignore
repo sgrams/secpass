@@ -4,6 +4,8 @@
 # secpass.org
 # 2019
 # This file is used to ignore files which are generated
+
+# General
 *~
 *.autosave
 *.a
@@ -38,40 +40,12 @@ Thumbs.db
 /.qmake.cache
 /.qmake.stash
 
-# qtcreator generated files
-*.pro.user*
-
-# xemacs temporary files
-*.flc
-
 # Vim temporary files
 .*.swp
 
-# Visual Studio generated files
-*.ib_pdb_index
-*.idb
-*.ilk
-*.pdb
-*.sln
-*.suo
-*.vcproj
-*vcproj.*.*.user
-*.ncb
-*.sdf
-*.opensdf
-*.vcxproj
-*vcxproj.*
-
-# MinGW generated files
-*.Debug
-*.Release
-
-# Python byte code
-*.pyc
-
 # Binaries
-*.dll
-*.exe
+*.so
+*.o
 
 # Build apart from build scripts
 build/*
@@ -82,3 +56,6 @@ build/*
 # Docs apart from doxygen config
 docs/*
 !docs/secpass.doxy
+
+# Keys
+*.pem
