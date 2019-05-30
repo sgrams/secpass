@@ -1,5 +1,5 @@
 /* src/core/random.h
- * Stanisław Grams <sgrams@fmdx.pl>
+ * Stanisław Grams <sjg@fmdx.pl>
  *
  * secpass.org
  * © 2019
@@ -11,16 +11,26 @@
 #include <sgx_cpuid.h>
 #include <sgx_tcrypto.h>
 
-// random_status_t: 64 bit variable containing error code
-typedef uint64_t random_status_t;
+#define DRNG_NOT_READY   0x00
+#define DRNG_UNAVAILABLE 0x01
+#define DRNG_AVAILABLE   0x02
+
+#define DRNG_DEF_RETRIES 10
+
+int32_t _get_rng_support (int32_t *cpuinfo);
 
 class Random {
-  random_status_t get_u64_rand (uint64_t *rand);
-  random_status_t get_u64_seed (uint64_t *seed);
-
   public:
   Random ();
   ~Random ();
+
+  bool          get_rng_support ();
+
+  core_status_t get_u32_rand (uint32_t *rand);
+  core_status_t get_u64_rand (uint64_t *rand);
+
+  core_status_t get_u32_seed (uint32_t *seed);
+  core_status_t get_u64_seed (uint64_t *seed);
 
 };
 #endif // _SECPASS_CORE_RANDOM_H

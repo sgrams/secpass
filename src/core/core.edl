@@ -1,5 +1,5 @@
 /* src/core/core.edl
- * Stanisław Grams <sgrams@fmdx.pl>
+ * Stanisław Grams <sjg@fmdx.pl>
  *
  * secpass.org
  * © 2019
@@ -7,9 +7,10 @@
 enclave {
   trusted {
     /* ECALLs */
-    public int entry_add ();
+
   };
   untrusted {
     /* OCALLs */
+    core_status_t ocall_get_epoch (uint64_t *time);
   };
 };

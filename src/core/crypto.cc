@@ -1,5 +1,5 @@
 /* src/core/crypto.cc
- * Stanisław Grams <sgrams@fmdx.pl>
+ * Stanisław Grams <sjg@fmdx.pl>
  *
  * secpass.org
  * © 2019
