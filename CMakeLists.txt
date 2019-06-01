@@ -16,8 +16,8 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
 endif ()
 
 # Tell CMake to run moc when necessary
-set (CMAKE_AUTOMOC ON)
-set (CMAKE_INCLUDE_CURRENT_DIR ON)
+#set (CMAKE_AUTOMOC ON)
+#set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Gather all src files from subdirs
 function (add_src_files list)

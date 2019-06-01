@@ -71,44 +71,4 @@ typedef struct entity {
 } entity_t;
 
 typedef string secret_t;
-
-// ECALL prototypes
-// !USER LEVEL (WRAPPERS TO GUI) SHALL BE PROVIDED HERE!
-core_status_t
-entry_add (
-    char *name,
-    size_t name_len,
-    char *secret,
-    size_t secret_len,
-    );
-
-// removes an entry by given name
-core_status_t
-entry_remove (char *name, size_t name_len);
-
-// decrypts a secret given in a parameter
-core_status_t
-entry_secret_decrypt (secret_t *secret);
-
-// encrypts a secret given in a parameter
-core_status_t
-entry_secret_encrypt (secret_t *secret);
-
-// decrypts db_key given in a parameter
-core_status_t
-database_key_decrypt (string *key, );
-
-// returns an entity or NULL in *entity parameter
-core_status_t
-entry_find (string name, entity_t *entity);
-
-// returns a bool if an entry has expired
-core_status_t
-entry_check_if_expired (char *name, bool *expired, size_t name_len);
-
-// OCALL prototypes
-// gets epoch to given uint64_t pointer
-core_status_t
-ocall_get_epoch (uint64_t *time);
-
 #endif // _SECPASS_CORE_H
