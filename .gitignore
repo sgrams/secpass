@@ -58,3 +58,9 @@ build/*
 # Docs apart from doxygen config
 docs/*
 !docs/secpass.doxy
+
+# SGX Bridge files
+*_t.c
+*_t.h
+*_u.c
+*_u.h
