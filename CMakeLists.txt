@@ -27,10 +27,6 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
-# Tell CMake to run moc when necessary
-#set (CMAKE_AUTOMOC ON)
-#set (CMAKE_INCLUDE_CURRENT_DIR ON)
-
 # Gather all src files from subdirs
 function (add_src_files list)
     get_property (is_defined GLOBAL PROPERTY SRC_LIST DEFINED)
