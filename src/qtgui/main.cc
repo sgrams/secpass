@@ -7,6 +7,10 @@
 #include <QApplication>
 #include "mainwindow.h"
 
+#include "../core/core_u.h"
+
+#include "sgx_eid.h"
+#include "sgx_urts.h"
 /*!
  * Main function
  * @param  int  argc

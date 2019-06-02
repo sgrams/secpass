@@ -25,11 +25,14 @@ int initialize_enclave(void)
 {
   sgx_status_t ret = SGX_ERROR_UNEXPECTED;
 
-  ret = sgx_create_enclave("enclave.so", 1, NULL, NULL, &global_eid, NULL);
+  ret = sgx_create_enclave("../lib/enclave.so", 1, NULL, NULL, &global_eid, NULL);
+  if (ret == SGX_SUCCESS) {
+    return 0;
+  }
+  ret = sgx_create_enclave("/usr/share/libsecpass/enclave.so", 1, NULL, NULL, &global_eid, NULL);
   if (ret != SGX_SUCCESS) {
     return -1;
   }
-
   return 0;
 }
 
