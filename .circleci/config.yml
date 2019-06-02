@@ -1,6 +1,6 @@
 version: 2
 aliases:
-  - &docker_image ubuntu:bionic
+  - &docker_image ubuntu:disco
   - &setup_common |
       apt-get update -qq
       apt-get install -y cmake qt5-default libqt5svg5-dev wget build-essential libssl-dev libncurses-dev
