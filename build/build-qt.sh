@@ -8,5 +8,3 @@
 ## © 2019
 cmake ..
 make secpass-qt
-mv src/secpass-qt .
-make clean

@@ -8,5 +8,3 @@
 ## © 2019
 cmake ..
 make secpass-nc
-mv src/secpass-nc .
-make clean
