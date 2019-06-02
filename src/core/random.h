@@ -24,13 +24,24 @@ class Random {
   Random ();
   ~Random ();
 
-  bool          get_rng_support ();
+  bool
+  get_rng_support ();
 
-  core_status_t get_u32_rand (uint32_t *rand);
-  core_status_t get_u64_rand (uint64_t *rand);
+  // random
+  core_status_t
+  get_u32_rand (uint32_t *rand);
 
-  core_status_t get_u32_seed (uint32_t *seed);
-  core_status_t get_u64_seed (uint64_t *seed);
+  core_status_t
+  get_u64_rand (uint64_t *rand);
 
+  // seed
+  core_status_t
+  get_u32_seed (uint32_t *seed);
+
+  core_status_t
+  get_u64_seed (uint64_t *seed);
+
+  core_status_t
+  get_n_bytes_rdrand_seed (uint8_t n, void *seed);
 };
 #endif // _SECPASS_CORE_RANDOM_H
