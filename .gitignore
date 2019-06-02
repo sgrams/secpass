@@ -46,8 +46,8 @@ Thumbs.db
 # Binaries
 *.so
 *.o
-!enclave.so
-!enclave.signed.so
+secpass-nc
+secpass-qt
 
 # Build apart from build scripts
 build/*
@@ -58,6 +58,3 @@ build/*
 # Docs apart from doxygen config
 docs/*
 !docs/secpass.doxy
-
-# Keys
-*.pem
