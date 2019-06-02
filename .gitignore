@@ -15,7 +15,7 @@
 *.obj
 *.orig
 *.rej
-*.so
+*._resource
 *.so.*
 *_pch.h.cpp
 *_resource.rc
@@ -46,6 +46,8 @@ Thumbs.db
 # Binaries
 *.so
 *.o
+!enclave.so
+!enclave.signed.so
 
 # Build apart from build scripts
 build/*

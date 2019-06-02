@@ -15,6 +15,14 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
     add_definitions (-Wsign-compare)
 endif ()
 
+set (SGX_SDK $ENV{SGX_SDK})
+set (SGX_ARCH x64)
+set (SGX_MODE SIM CACHE STRING "SGX mode: SIM or HW") # SGX mode: sim, hw
+set (COMPILE_EXAMPLES NO CACHE BOOL "Build examples")
+set (SGX_BUILD DEBUG CACHE STRING "Build: DEBUG, PRERELEASE or RELEASE")
+
+include (cmake/sgx_init.cmake)
+
 # Tell CMake to run moc when necessary
 #set (CMAKE_AUTOMOC ON)
 #set (CMAKE_INCLUDE_CURRENT_DIR ON)
