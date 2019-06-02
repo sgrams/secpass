@@ -11,9 +11,27 @@
 #include <unistd.h>
 
 #include "../common/secpass.h"
+#include "../core/core_u.h"
+
+#include "sgx_eid.h"
+#include "sgx_urts.h"
+
+sgx_enclave_id_t global_eid  = 0;
 
 // prototypes
 void print_help ();
+
+int initialize_enclave(void)
+{
+  sgx_status_t ret = SGX_ERROR_UNEXPECTED;
+
+  ret = sgx_create_enclave("enclave.so", 1, NULL, NULL, &global_eid, NULL);
+  if (ret != SGX_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
 
 /*!
  * Main function
@@ -27,12 +45,18 @@ void print_help ();
 int
 main (int argc, char *argv[])
 {
+  int x = 0;
   int status = 0;
 
-  if (argc < 2) {
-    print_help ();
-    return status;
+  if (initialize_enclave () < 0) {
+    std::cerr << "dupa!\n";
   }
+  sgx_status_t rv = entry_test (global_eid, &x);
+  std::cout << x << std::endl;
+  if (rv != SGX_SUCCESS) {
+    std::cout << "noob" << std::endl;
+  }
+  std::cout << "wtf!" << std::endl;
 
   return status;
 }
@@ -45,7 +69,7 @@ main (int argc, char *argv[])
  * @author Stanisław Grams
  * @date   2019/05/03
  */
-void
+  void
 print_help ()
 {
   std::cout <<
