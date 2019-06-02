@@ -19,10 +19,10 @@
 
 int32_t _get_rng_support (int32_t *cpuinfo);
 
-class Random {
+class core_random_c {
   public:
-  Random ();
-  ~Random ();
+  core_random_c ();
+  ~core_random_c ();
 
   bool
   get_rng_support ();
@@ -34,6 +34,8 @@ class Random {
   core_status_t
   get_u64_rand (uint64_t *rand);
 
+  core_status_t
+  get_n_bytes_rand (void *iv, size_t n);
   // seed
   core_status_t
   get_u32_seed (uint32_t *seed);

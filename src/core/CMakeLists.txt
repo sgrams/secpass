@@ -26,12 +26,19 @@ include_directories (
   ${SGX_SDK}/include
   ${SGX_SDK}/include/tlibc
   ${SGX_SDK}/include/stlport
+  ${SGX_SDK}/include/libcxx
   .
   )
 
 add_library (core SHARED
-  core.cc core.h
-  core_t.c core_u.h
+  core.cc
+  core.h
+  random.cc
+  random.h
+  crypto.cc
+  crypto.h
+  core_t.c
+  core_u.h
   )
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SGX_COMMON_CFLAGS} -nostdinc -fvisibility=hidden -fpie -fstack-protector")

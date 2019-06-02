@@ -9,15 +9,16 @@
  */
 #ifndef _SECPASS_CORE_H
 #define _SECPASS_CORE_H
+#include <sgx.h>
+#include <string>
+
 #include "../common/macros.h"
 #include "../common/secpass.h"
 
-#include <sgx.h>
-
 using namespace std;
-// version of file format
-#define SECPASS_CORE_FILE_VERSION 0x01
 
+// core_status_t: 64 bit variable containing error code
+typedef uint64_t core_status_t;
 // definitions of error codes for core_status_t
 
 #define CORE_OK          0x00
@@ -26,21 +27,15 @@ using namespace std;
 #define CORE_ER_ENCRYPT  0x03
 
 #define CORE_ER_DRNG     0x04
+#define CORE_ER_CMAC     0x05
 #define CORE_ER_UNDEF    0xFF
 
-// core_status_t: 64 bit variable containing error code
-typedef uint64_t core_status_t;
-// version_t: 8 bit variable determining version type
-typedef uint8_t version_t;
-
-// kdf_t: enum determining KDF function used
-typedef enum kdf { ARGON2, KDF_RESERVED } kdf_t;
-
-// enc_t: enum determining encryption function used
-typedef enum enc { AES256GCM, ENC_RESERVED } enc_t;
-
 // iv_t: 8 bit variable containing init vector
-typedef uint8_t iv_t[32]; // 32 * 8 bit = 256 bit IV
+typedef uint8_t iv_t[12]; // 12 * 8 bit = 96 bit IV
 
-typedef char * secret_t;
+// secret_t: string containing the secret
+typedef string secret_t;
+
+// key_128_bit_t: 128 bit variable containing the master key
+typedef uint8_t key_128bit_t[16];
 #endif // _SECPASS_CORE_H

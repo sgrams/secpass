@@ -5,9 +5,23 @@
  * © 2019
  */
 enclave {
+  from "sgx_tstdc.edl" import *;
   trusted {
-    public int entry_test ();
+    // authentication
+    public uint64_t auth ([user_check] uint8_t *key, size_t len);
+    public uint64_t deauth (void);
+
+    // entry
+    public uint64_t entry_add ([in, string] const char *name, [in, string] const char *secret);
+    public uint64_t entry_del ([in, string] const char *name);
+    public uint64_t entry_find ([in, string] const char *name, [in, out, string] char *secret);
+    public int64_t entry_check ([in, string] const char *name);
+
+    // serialization
+    public uint64_t map_dump ([in, out] uint8_t *content, [in]size_t *len);
+    public uint64_t map_load ([in, out] uint8_t *content, size_t len);
   };
+
   untrusted {
   };
 };

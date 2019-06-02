@@ -31,7 +31,7 @@ _get_rng_support (int32_t *cpuinfo)
   return ret;
 }
 
-Random::Random ()
+core_random_c::core_random_c ()
 {
   int32_t cpuinfo[4];
   sgx_status_t status;
@@ -42,18 +42,18 @@ Random::Random ()
   }
 }
 
-Random::~Random ()
+core_random_c::~core_random_c ()
 {
 }
 
 bool
-Random::get_rng_support ()
+core_random_c::get_rng_support ()
 {
   return (_drng_init & DRNG_AVAILABLE) == DRNG_AVAILABLE;
 }
 
 core_status_t
-Random::get_u32_rand (uint32_t *rand)
+core_random_c::get_u32_rand (uint32_t *rand)
 {
   core_status_t status = CORE_OK;
   uint32_t retries = DRNG_DEF_RETRIES;
@@ -70,7 +70,7 @@ Random::get_u32_rand (uint32_t *rand)
 }
 
 core_status_t
-Random::get_u64_rand (uint64_t *rand)
+core_random_c::get_u64_rand (uint64_t *rand)
 {
   core_status_t status = CORE_OK;
   uint32_t retries = DRNG_DEF_RETRIES;
@@ -88,7 +88,7 @@ Random::get_u64_rand (uint64_t *rand)
 
 
 core_status_t
-Random::get_u32_seed (uint32_t *seed)
+core_random_c::get_u32_seed (uint32_t *seed)
 {
 #ifdef COMPILER_HAS_RDSEED_SUPPORT
   core_status_t status = CORE_OK;
@@ -113,7 +113,7 @@ Random::get_u32_seed (uint32_t *seed)
 }
 
 core_status_t
-Random::get_u64_seed (uint64_t *seed)
+core_random_c::get_u64_seed (uint64_t *seed)
 {
 #ifdef COMPILER_HAS_RDSEED_SUPPORT
   core_status_t status = CORE_OK;
@@ -138,7 +138,7 @@ Random::get_u64_seed (uint64_t *seed)
 }
 
 core_status_t
-Random::get_n_bytes_rdrand_seed (uint8_t n, void *seed) {
+core_random_c::get_n_bytes_rdrand_seed (uint8_t n, void *seed) {
   // Use CMAC to generate 128-bit seeds from rdrand.
   // DRNG is guaranteed to reseed after 512 * 128 bits generated.
   core_status_t           status = CORE_OK;
@@ -179,4 +179,13 @@ Random::get_n_bytes_rdrand_seed (uint8_t n, void *seed) {
 GET_N_BYTES_RDRAND_SEED_CLEANUP:
   sgx_cmac128_close (hcmac);
   return status;
+}
+
+core_status_t
+core_random_c::get_n_bytes_rand (void *iv, size_t n)
+{
+  if (SGX_SUCCESS != sgx_read_rand ((uint8_t *)iv, n)) {
+    return CORE_ER_DRNG;
+  }
+  return CORE_OK;
 }
