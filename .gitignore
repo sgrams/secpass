@@ -64,3 +64,6 @@ docs/*
 *_t.h
 *_u.c
 *_u.h
+
+# Valgrind dumps
+*.vgcore*
