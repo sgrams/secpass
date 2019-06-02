@@ -32,6 +32,7 @@ add_src_files (
   NC_SRC_LIST
   main.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/../core/core_u.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/wrapper.cc
   )
 
 get_property (${PROJECT_NAME}_NC_SRC GLOBAL PROPERTY NC_SRC_LIST)

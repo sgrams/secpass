@@ -9,32 +9,16 @@
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
+#include <ctype.h>
+#include <string>
+#include <vector>
 
 #include "../common/secpass.h"
-#include "../core/core_u.h"
-
-#include "sgx_eid.h"
-#include "sgx_urts.h"
-
-sgx_enclave_id_t global_eid  = 0;
+#include "../common/wrapper.h"
 
 // prototypes
-void print_help ();
-
-int initialize_enclave(void)
-{
-  sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-
-  ret = sgx_create_enclave("../lib/enclave.so", 1, NULL, NULL, &global_eid, NULL);
-  if (ret == SGX_SUCCESS) {
-    return 0;
-  }
-  ret = sgx_create_enclave("/usr/share/libsecpass/enclave.so", 1, NULL, NULL, &global_eid, NULL);
-  if (ret != SGX_SUCCESS) {
-    return -1;
-  }
-  return 0;
-}
+void
+print_help (void);
 
 /*!
  * Main function
@@ -48,18 +32,59 @@ int initialize_enclave(void)
 int
 main (int argc, char *argv[])
 {
-  int x = 0;
   int status = 0;
+  int c;
+  std::vector<std::string> paths;
 
-  if (initialize_enclave () < 0) {
-    std::cerr << "dupa!\n";
+  // parse command line parameters
+  if (argc < 2) {
+    print_help ();
+    return status;
   }
-  sgx_status_t rv = entry_test (global_eid, &x);
-  std::cout << x << std::endl;
-  if (rv != SGX_SUCCESS) {
-    std::cout << "noob" << std::endl;
+  while ((c = getopt (argc, argv, "e:i:t:")) != -1)
+  {
+    switch (c) {
+    case 'e':
+      break;
+    case 'i':
+      break;
+    case 't':
+      break;
+    case '?':
+      if (optopt == 'e' || optopt == 'i' || optopt == 't') {
+        fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+      } else {
+        fprintf (stderr, "Unknown option `-%c`.\n", optopt);
+      }
+      return 1;
+    default:
+      status = -1;
+    }
   }
-  std::cout << "wtf!" << std::endl;
+  for (int i = optind; i < argc; ++i)
+  {
+    paths.push_back (std::string (argv[i]));
+  }
+  if (paths.size () == 0) {
+    fprintf (stderr, "Fatal error: none path given!\n");
+    status = -1;
+    return status;
+  }
+
+  initialize_enclave ();
+  string asd = string ("dupa");
+  int64_t rv = secret_check (asd);
+  std::cout << rv << std::endl;
+
+  secret_add (asd, "asdf");
+  rv = secret_check (asd);
+  std::cout << rv << std::endl;
+
+  secret_del (asd);
+  rv = secret_check (asd);
+  std::cout << rv << std::endl;
+
+  destroy_enclave ();
 
   return status;
 }
@@ -72,7 +97,7 @@ main (int argc, char *argv[])
  * @author Stanisław Grams
  * @date   2019/05/03
  */
-  void
+void
 print_help ()
 {
   std::cout <<
