@@ -5,9 +5,14 @@
  * © 2019
  */
 #include "wrapper.h"
+#include <vector>
+
+using namespace std;
 
 sgx_enclave_id_t global_eid = 0;
 bool authenticated = false;
+vector<string> names;
+
 wrapper_status_t
 initialize_enclave (void)
 {
@@ -31,8 +36,10 @@ wrapper_status_t
 secret_add (string name, string secret)
 {
   uint64_t rv;
+  uint8_t  sc;
   wrapper_status_t status = WRAP_OK;
-  if (!secret_check (name)) {
+  secret_check (name, &sc);
+  if (!sc) {
     return WRAP_ER_UNDEF;
   }
 
@@ -43,6 +50,7 @@ secret_add (string name, string secret)
   if (SGX_SUCCESS != entry_add (global_eid, &rv, str, sec)) {
     return WRAP_ER_ADD;
   }
+  names.push_back (name);
 
   delete[] sec;
   return status;
@@ -70,12 +78,13 @@ secret_del (string name)
   return status;
 }
 
-int64_t
-secret_check (string name) {
-  int64_t rv;
+wrapper_status_t
+secret_check (string name, uint8_t *rv) {
+  uint64_t rs;
   const char *str = name.c_str ();
-  if (SGX_SUCCESS == entry_check (global_eid, &rv, str)) {
-    return rv;
+
+  if (SGX_SUCCESS != entry_check (global_eid, &rs, str, rv)) {
+    return WRAP_ER_UNDEF;
   }
-  return -1;
+  return rs;
 }

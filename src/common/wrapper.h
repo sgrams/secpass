@@ -36,6 +36,7 @@ typedef uint64_t wrapper_status_t;
 #define WRAP_ER_DESTROY  0x02
 #define WRAP_ER_ADD      0x03
 #define WRAP_ER_DEL      0x04
+#define WRAP_ER_WR_PARAM 0x05
 #define WRAP_ER_UNDEF    0xFF
 
 wrapper_status_t
@@ -59,8 +60,8 @@ secret_set (char *name, size_t name_len, char *secret, size_t secret_len);
 wrapper_status_t
 secret_del (string name);
 
-int64_t
-secret_check (string name);
+wrapper_status_t
+secret_check (string name, uint8_t *rv);
 //wrapper_status_t
 //secret_list (std::vector<std::string> *vector);
 

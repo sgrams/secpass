@@ -51,27 +51,33 @@ deauth (void)
   return CORE_OK;
 }
 
-int64_t
-entry_check (const char *name)
+core_status_t
+entry_check (const char *name, uint8_t *rv)
 {
   string name_str = string (name);
-  return (secret_map.count (name_str) == 0);
+  if (!rv) {
+    return CORE_ER_WR_PARAM;
+  }
+  *rv = !secret_map.count (name_str);
+
+  return CORE_OK;
 }
 
 core_status_t
 entry_add (const char *name, const char *secret)
 {
+  uint8_t rv;
   core_status_t status = CORE_OK;
   uint8_t *sec = (uint8_t *)malloc (strlen (secret) + 1);
 
-  if (entry_check (name) && sec) {
+  entry_check (name, &rv);
+  if (sec && rv) {
     crypto.encrypt_aes128gcm (key, (uint8_t *)secret, strlen (secret) + 1, sec, iv, 12, tag);
     secret_map[name] = string ((char *)sec);
     return status;
   }
 
   free (sec);
-
   return status;
 }
 
@@ -90,12 +96,15 @@ entry_del (const char *name)
 core_status_t
 entry_find (const char *name, char *secret)
 {
+  uint8_t rv;
   core_status_t status = CORE_OK;
   string name_str = string (name);
-  if (entry_check (name)) {
-    status = CORE_ER_UNDEF;
+  status = entry_check (name, &rv);
+  if (status != CORE_OK) {
+    return status;
   }
 
+  // TODO: implement checking, etc
   return status;
 }
 
@@ -108,7 +117,7 @@ map_dump (uint8_t *content, size_t *len)
 }
 
 core_status_t
-map_load (uint8_t *content, size_t len)
+map_load (uint8_t *content, size_t *len)
 {
   core_status_t status = CORE_OK;
 

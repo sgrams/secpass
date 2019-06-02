@@ -71,18 +71,20 @@ main (int argc, char *argv[])
     return status;
   }
 
+  uint8_t rv;
   initialize_enclave ();
+
   string asd = string ("dupa");
-  int64_t rv = secret_check (asd);
-  std::cout << rv << std::endl;
+  secret_check (asd, &rv);
+  std::cout << (int)rv << std::endl;
 
   secret_add (asd, "asdf");
-  rv = secret_check (asd);
-  std::cout << rv << std::endl;
+  secret_check (asd, &rv);
+  std::cout << (int)rv << std::endl;
 
   secret_del (asd);
-  rv = secret_check (asd);
-  std::cout << rv << std::endl;
+  secret_check (asd, &rv);
+  std::cout << (int)rv << std::endl;
 
   destroy_enclave ();
 

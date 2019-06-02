@@ -38,4 +38,5 @@ typedef string secret_t;
 
 // key_128_bit_t: 128 bit variable containing the master key
 typedef uint8_t key_128bit_t[16];
+
 #endif // _SECPASS_CORE_H
