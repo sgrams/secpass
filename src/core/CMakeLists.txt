@@ -46,13 +46,13 @@ target_link_libraries (core PRIVATE "${SGX_COMMON_CFLAGS}\
   -Wl,--defsym,__ImageBase=0 -Wl,--gc-sections   \
   -L${CMAKE_CURRENT_SOURCE_DIR}")
 
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../lib/)
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/)
 add_custom_command (TARGET core
   POST_BUILD
   COMMAND ${SGX_ENCLAVE_SIGNER} sign
   -key core_private.pem
   -config core.config.xml
   -enclave $<TARGET_FILE:core>
-  -out enclave.so
+  -out ${CMAKE_SOURCE_DIR}/lib/enclave.so
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Signing the core enclave => enclave.so")
