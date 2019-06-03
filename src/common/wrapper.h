@@ -8,6 +8,7 @@
 #define _SECPASS_COMMON_WRAPPER_H
 #include <cstdint>
 #include <string>
+#include <vector>
 #include "../core/core_u.h"
 #include "../core/core.h"
 
@@ -62,7 +63,8 @@ secret_del (string name);
 
 wrapper_status_t
 secret_check (string name, uint8_t *rv);
-//wrapper_status_t
-//secret_list (std::vector<std::string> *vector);
+
+wrapper_status_t
+fetch_names (vector<string> *rv);
 
 #endif // _SECPASS_COMMON_WRAPPER_H

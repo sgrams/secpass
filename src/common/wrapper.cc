@@ -6,6 +6,7 @@
  */
 #include "wrapper.h"
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -74,6 +75,10 @@ secret_del (string name)
   if (SGX_SUCCESS != entry_del (global_eid, &rv, str)) {
     return WRAP_ER_DEL;
   }
+  auto it = find (names.begin (), names.end (), name);
+  if (it != names.end ()) {
+    names.erase (it);
+  }
 
   return status;
 }
@@ -87,4 +92,12 @@ secret_check (string name, uint8_t *rv) {
     return WRAP_ER_UNDEF;
   }
   return rs;
+}
+
+wrapper_status_t
+fetch_names (vector<string> *rv)
+{
+  wrapper_status_t status = WRAP_OK;
+  *rv = names;
+  return status;
 }
