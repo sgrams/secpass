@@ -16,6 +16,9 @@
 #include "../common/secpass.h"
 #include "../common/wrapper.h"
 
+#include "window.h"
+#include "draw.h"
+
 // prototypes
 void
 print_help (void);
@@ -70,24 +73,20 @@ main (int argc, char *argv[])
     status = -1;
     return status;
   }
-
-  uint8_t rv;
   initialize_enclave ();
+  File *file = new File ("dupa.secdb");
 
-  string asd = string ("dupa");
-  secret_check (asd, &rv);
-  std::cout << (int)rv << std::endl;
+  // start and handle UI
+  uint32_t pos = 0;
+  Draw::init ();
+  while (true)
+  {
+    Draw::draw (file, pos);
+    getch ();
+  }
 
-  secret_add (asd, "asdf");
-  secret_check (asd, &rv);
-  std::cout << (int)rv << std::endl;
-
-  secret_del (asd);
-  secret_check (asd, &rv);
-  std::cout << (int)rv << std::endl;
 
   destroy_enclave ();
-
   return status;
 }
 
