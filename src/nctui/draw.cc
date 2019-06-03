@@ -94,6 +94,18 @@ Draw::draw (File *file, uint32_t selected)
 }
 
 void
+Draw::stop ()
+{
+  delete title_window;
+  delete entries_window;
+  delete control_window;
+  delete input_window;
+
+  endwin ();
+  curs_set (1);
+}
+
+void
 draw_title (File *file)
 {
   title_window->clear ();
@@ -115,14 +127,14 @@ draw_controls ()
   stringstream line;
 
   control_window->move (0, 0);
-  line << "[" << ((char) EXIT_KEY) << "] quit          ";
-  line << "[Space] add entry          ";
+  line << "[" << ((char) EXIT_KEY) << "] quit           ";
+  line << "[space] add entry";
   control_window->print(line.str());
   line.str("");
 
   control_window->move(0, 1);
   line << "[" << ((char) REMOVE_KEY) << "] delete entry   ";
-  line << "[Return] show entry   ";
+  line << "[enter] show entry   ";
   control_window->print(line.str());
   line.str("");
 

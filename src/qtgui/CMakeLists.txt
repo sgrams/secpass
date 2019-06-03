@@ -39,6 +39,7 @@ add_src_files (QT_SRC_LIST
   settingsdialog.cc
   settingsdialog.h
   ${CMAKE_CURRENT_SOURCE_DIR}/../core/core_u.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/wrapper.cc
   )
 
 add_src_files (QT_UI_SRC_LIST

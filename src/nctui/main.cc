@@ -74,7 +74,11 @@ main (int argc, char *argv[])
     return status;
   }
   initialize_enclave ();
-  File *file = new File ("dupa.secdb");
+  File *file = new File (paths.at(0));
+  //file.open ();
+
+  if (!file->is_open) {
+  }
 
   // start and handle UI
   uint32_t pos = 0;
@@ -82,10 +86,13 @@ main (int argc, char *argv[])
   while (true)
   {
     Draw::draw (file, pos);
-    getch ();
+    char c = getch ();
+    if (c == 'q') {
+      break;
+    }
   }
 
-
+  Draw::stop ();
   destroy_enclave ();
   return status;
 }

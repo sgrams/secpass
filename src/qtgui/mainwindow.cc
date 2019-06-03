@@ -10,8 +10,14 @@
 #include <QDateTime>
 #include <QDialog>
 #include <QUrl>
+#include <QList>
+#include <QString>
+#include <QStringListModel>
+#include <QVector>
+#include <string>
 
 #include "../common/secpass.h"
+#include "../common/wrapper.h"
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -41,6 +47,9 @@ MainWindow::MainWindow (QWidget *parent) :
 
   // set title
   setWindowTitle (QString ("secpass %1").arg(SECPASS_VERSION));
+
+  initialize_enclave ();
+  destroy_enclave ();
 }
 
 /*!
@@ -104,6 +113,7 @@ MainWindow::on_actionHomepage_triggered ()
     QMessageBox::warning (this, tr ("Error"), tr ("Failed to open secpass homepage"), QMessageBox::Close);
   }
 }
+
 /*!
  * MainWindow destructor
  *
@@ -112,5 +122,6 @@ MainWindow::on_actionHomepage_triggered ()
  */
 MainWindow::~MainWindow ()
 {
+  destroy_enclave ();
   delete ui;
 }
