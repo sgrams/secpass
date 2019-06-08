@@ -12,4 +12,6 @@
 #define SECPASS_HOMEPAGE "https://secpass.org/"
 
 #define MAX_NAME_LEN 1024
+#define MAX_SECRET_LEN 4096
+#define DEFAULT_IDLE_TIME 60 // time in seconds
 #endif // _SECPASS_COMMON_H
