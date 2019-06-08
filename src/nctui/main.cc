@@ -6,22 +6,22 @@
  */
 #include <iostream>
 
-#include <cstdio>
-#include <cstdlib>
 #include <unistd.h>
 #include <ctype.h>
 #include <string>
 #include <vector>
 
 #include "../common/secpass.h"
-#include "../common/wrapper.h"
+#include "../common/bridge.h"
 
-#include "window.h"
-#include "draw.h"
+#include "ui.h"
 
 // prototypes
 void
 print_help (void);
+
+void
+print_version (void);
 
 /*!
  * Main function
@@ -35,7 +35,8 @@ print_help (void);
 int
 main (int argc, char *argv[])
 {
-  int status = 0;
+  int status = UI_OK;
+  int idle_time = DEFAULT_IDLE_TIME;
   int c;
   std::vector<std::string> paths;
 
@@ -44,56 +45,61 @@ main (int argc, char *argv[])
     print_help ();
     return status;
   }
-  while ((c = getopt (argc, argv, "e:i:t:")) != -1)
+  while ((c = getopt (argc, argv, "vht:")) != -1)
   {
     switch (c) {
-    case 'e':
-      break;
-    case 'i':
-      break;
+    // print version
+    case 'v':
+      print_version ();
+      return status;
+    // print help
+    case 'h':
+      print_help ();
+      return status;
+    // set timeout time
     case 't':
+      idle_time = stoi (optarg);
       break;
     case '?':
-      if (optopt == 'e' || optopt == 'i' || optopt == 't') {
-        fprintf (stderr, "Option -%c requires an argument.\n", optopt);
-      } else {
-        fprintf (stderr, "Unknown option `-%c`.\n", optopt);
-      }
       return 1;
     default:
       status = -1;
     }
   }
+
+  // handle filepaths
   for (int i = optind; i < argc; ++i)
   {
     paths.push_back (std::string (argv[i]));
   }
   if (paths.size () == 0) {
-    fprintf (stderr, "Fatal error: none path given!\n");
+    std::cerr << "Error: Path to secpass file was not given. Exiting.\n";
     status = -1;
     return status;
   }
-  initialize_enclave ();
-  File *file = new File (paths.at(0));
-  //file.open ();
 
-  if (!file->is_open) {
+  // start main event loop
+  status = br_enclave_init ();
+  if (BRIDGE_OK != status) {
+    std::cerr << "Fatal error: secpass was not able to initialize secure enclave. Exiting.\n";
+    goto MAIN_SECPASS_EXIT;
   }
 
-  // start and handle UI
-  uint32_t pos = 0;
-  Draw::init ();
-  while (true)
-  {
-    Draw::draw (file, pos);
-    char c = getch ();
-    if (c == 'q') {
-      break;
+  status = Ui::main_loop (idle_time, paths.at(0));
+  if (UI_OK != status) {
+    if (UI_ERR_FILE == status) {
+      std::cout << "Unable to open `" << paths.at(0) << "`. The database is broken or the master password is invalid.\n";
     }
+    goto SAFE_SECPASS_EXIT;
   }
 
-  Draw::stop ();
-  destroy_enclave ();
+SAFE_SECPASS_EXIT:
+  status = br_enclave_close ();
+  if (BRIDGE_OK != status) {
+    std::cerr << "Fatal error: secpass was not able to close secure enclave. Exiting.\n";
+  }
+
+MAIN_SECPASS_EXIT:
   return status;
 }
 
@@ -110,11 +116,26 @@ print_help ()
 {
   std::cout <<
     "secpass-nc " << SECPASS_VERSION << " © " << SECPASS_AUTHORS << "\n" <<
-    "Usage: secpass-nc /path/to/dbfile [OPTIONS] /path/to/file\n"     <<
+    "Usage: secpass-nc /path/to/dbfile\n"     <<
     "Options:\n" <<
-    "  -e\tExport secdb to kdbx file (requires path)\n"   <<
-    "  -i\tImport secdb from kdbx file (requires path)\n" <<
-    "  -t\tLock interface after given timeout in s\n";
+    "  -v\tprint version\n" <<
+    "  -h\tprint this help\n" <<
+    "  -t\texit application after given idle time in [s] (default: " << DEFAULT_IDLE_TIME << "s)\n";
 
+  return;
+}
+
+/*!
+ * Prints version to stdout
+ * @param  void
+ * @retval void
+ *
+ * @author Stanisław Grams
+ * @date   2019/06/07
+ */
+void
+print_version ()
+{
+  std::cout << "secpass-nc " << SECPASS_VERSION << "\n";
   return;
 }

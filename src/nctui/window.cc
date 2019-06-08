@@ -6,6 +6,9 @@
  */
 #include "window.h"
 #include <string>
+#include <cstdlib>
+#include <cstring>
+#include <sstream>
 
 using namespace std;
 
@@ -32,6 +35,71 @@ Window::~Window ()
 {
   delwin (border);
   delwin (win);
+}
+
+void
+Window::get_password (string message, string *buf)
+{
+  noecho ();
+  int c;
+  std::stringstream line;
+
+  move (0, 0);
+  print (message);
+  draw ();
+  move (0, 1);
+
+  while ((c = getch ()) != 0xA)
+  {
+    move (0, 0);
+    print (message);
+    move (0, 1);
+    // if backspace
+    if (c == 0x08 || c == 127 || c == KEY_BACKSPACE) {
+      buf->resize (buf->length () - 1);
+    }
+    else if (c != 0x1B) { // if not backspace and escape
+      *buf += c;
+    }
+    line << ".";
+    this->print (line.str (), 0, 1);
+    this->draw ();
+  }
+
+  c = 0;
+  return;
+}
+
+void
+Window::get_input (string message, string *buf)
+{
+  int c;
+  noecho ();
+
+  move (0, 1);
+  while ((c = getch ()) != 0xA)
+  {
+    clear ();
+    move (0, 0);
+    wprintw (this->get_window (), "%s", message.c_str ());
+    draw ();
+
+    // if backspace
+    if (c == 0x08 || c == 127 || c == KEY_BACKSPACE) {
+      buf->resize (buf->length () - 1);
+    }
+    else if (c != 0x1B) { // if not backspace and escape
+      *buf += c;
+    }
+
+    move (0, 1);
+    wprintw (this->get_window (), "%s", buf->c_str ());
+    draw ();
+  }
+
+  c = 0;
+
+  return;
 }
 
 void

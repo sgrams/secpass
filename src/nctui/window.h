@@ -48,5 +48,8 @@ class Window {
     bool mouse (int &x, int &y);
 
     WINDOW *get_window ();
+
+    void get_password (string message, string *buf);
+    void get_input    (string message, string *buf);
 };
 #endif // _SECPASS_NCTUI_WINDOW_H

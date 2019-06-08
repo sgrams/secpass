@@ -31,13 +31,17 @@ set_source_files_properties (
 add_src_files (
   NC_SRC_LIST
   main.cc
-  window.cc
   draw.cc
-  window.h
-  draw.h
+  window.cc
+  ui.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/../core/core_u.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/wrapper.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/bridge.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/file.cc
+
+  # headers
+  draw.h
+  window.h
+  ui.h
   )
 
 get_property (${PROJECT_NAME}_NC_SRC GLOBAL PROPERTY NC_SRC_LIST)
