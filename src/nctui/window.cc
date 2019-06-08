@@ -40,30 +40,42 @@ Window::~Window ()
 void
 Window::get_password (string message, string *buf)
 {
+  bool type = true;
+  int c = 0x00;
   noecho ();
-  int c;
-  std::stringstream line;
 
-  move (0, 0);
-  print (message);
-  draw ();
-  move (0, 1);
+  string line;
 
-  while ((c = getch ()) != 0xA)
-  {
+  while (type) {
     move (0, 0);
-    print (message);
+    wprintw (this->get_window (), "%s", message.c_str ());
     move (0, 1);
-    // if backspace
-    if (c == 0x08 || c == 127 || c == KEY_BACKSPACE) {
-      buf->resize (buf->length () - 1);
+    wprintw (this->get_window (), "%s", line.c_str ());
+    draw ();
+
+    switch (c = getch ()) {
+      case '\n':
+        if (buf->length () > 0) {
+          type = false;
+          break;
+        }
+        continue;
+        break;
+      case 127:
+      case 0x08:
+      case KEY_BACKSPACE:
+        if (buf->length () > 0 && line.length () > 0) {
+          buf->resize (buf->length () - 1);
+          line.resize (line.length () - 1);
+        }
+        break;
+      case 27:
+        break;
+      default:
+        *buf += c;
+        line += ".";
+        break;
     }
-    else if (c != 0x1B) { // if not backspace and escape
-      *buf += c;
-    }
-    line << ".";
-    this->print (line.str (), 0, 1);
-    this->draw ();
   }
 
   c = 0;
@@ -73,32 +85,41 @@ Window::get_password (string message, string *buf)
 void
 Window::get_input (string message, string *buf)
 {
-  int c;
+  bool type = true;
+  int c = 0x00;
   noecho ();
 
-  move (0, 1);
-  while ((c = getch ()) != 0xA)
-  {
-    clear ();
+  while (type) {
     move (0, 0);
     wprintw (this->get_window (), "%s", message.c_str ());
-    draw ();
-
-    // if backspace
-    if (c == 0x08 || c == 127 || c == KEY_BACKSPACE) {
-      buf->resize (buf->length () - 1);
-    }
-    else if (c != 0x1B) { // if not backspace and escape
-      *buf += c;
-    }
-
     move (0, 1);
     wprintw (this->get_window (), "%s", buf->c_str ());
     draw ();
+
+    switch (c = getch ()) {
+      case '\n':
+        if (buf->length () > 0) {
+          type = false;
+          break;
+        }
+        continue;
+        break;
+      case 127:
+      case 0x08:
+      case KEY_BACKSPACE:
+        if (buf->length () > 0) {
+          buf->resize (buf->length () - 1);
+        }
+        break;
+      case 27:
+        break;
+      default:
+        *buf += c;
+        break;
+    }
   }
 
   c = 0;
-
   return;
 }
 

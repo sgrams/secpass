@@ -32,14 +32,18 @@ typedef uint8_t enc_t;
 typedef uint64_t bridge_status_t;
 
 // definitions of error codes for core_status_t
-#define BRIDGE_OK          0x00
-#define BRIDGE_ER_INIT     0x01
-#define BRIDGE_ER_DESTROY  0x02
-#define BRIDGE_ER_ADD      0x03
-#define BRIDGE_ER_DEL      0x04
-#define BRIDGE_ER_WR_PARAM 0x05
-#define BRIDGE_ER_FETCH    0x06
-#define BRIDGE_ER_UNDEF    0xFF
+#define BRIDGE_OK            0x00
+#define BRIDGE_ER_INIT       0x01
+#define BRIDGE_ER_DESTROY    0x02
+#define BRIDGE_ER_ADD        0x03
+#define BRIDGE_ER_DEL        0x04
+#define BRIDGE_ER_FETCH      0x05
+#define BRIDGE_ER_WR_PARAM   0x06
+#define BRIDGE_ER_WR_FILE    0x07
+#define BRIDGE_ER_WR_EXT     0x08
+#define BRIDGE_ER_FILE_INIT  0x09
+#define BRIDGE_ER_FILE_CLOSE 0x0A
+#define BRIDGE_ER_UNDEF      0xFF
 
 bridge_status_t
 br_enclave_init (void);
@@ -48,10 +52,19 @@ bridge_status_t
 br_enclave_close (void);
 
 bridge_status_t
+br_file_check (string filepath);
+
+bridge_status_t
+br_file_exists (string filepath);
+
+bridge_status_t
 br_file_open (string master_key, string filepath);
 
 bridge_status_t
-br_file_close (void);
+br_file_save (string filepath);
+
+bridge_status_t
+br_file_create (string filepath, string master_key);
 
 bridge_status_t
 br_secret_add (string name, string secret);

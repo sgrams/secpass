@@ -26,7 +26,7 @@ using namespace std;
 #define UI_ERR_UNDEF 0xFF
 
 namespace Ui {
-  int main_loop (int idle_time, string filepath);
+  int main_loop (int idle_time, string filepath, string key_filepath);
   int handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements);
 };
 

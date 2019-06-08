@@ -9,20 +9,15 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-using namespace std;
+#include <string>
 
-class File {
-  public:
-    bool     is_open = false;
-    string   path;
-    ifstream fs;
-    vector<string> names;
+#include "secpass.h"
 
-    File  (string filepath);
-    ~File ();
+// for json support
+#include "json.hpp"
 
-    void open  ();
-    void save  ();
-    void close ();
-};
+using nlohmann::json;
+
+#define SECPASS_FILE_VERSION 0x0
+
 #endif //_SECPASS_COMMON_FILE_H

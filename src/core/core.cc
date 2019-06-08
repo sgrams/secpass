@@ -15,39 +15,55 @@
 #include "crypto.h"
 
 #include "string.h"
+
 #include <map>
 #include <string>
 
 core_crypto_c crypto;
 
-std::map<string, string> secret_map;
-key_128bit_t key;
-iv_t         iv     = {0};
-bool         iv_set = false;
+static std::map<string, uint8_t[MAX_SECRET_LEN]> secret_map;
+static std::map<string, iv_t>   iv_map;
+
+static key_128bit_t mem_key;
 uint8_t      tag[16];
 
 core_status_t
-set_iv (void)
+get_iv (const char *name, uint8_t *iv, size_t *len)
 {
   core_status_t status = CORE_OK;
-  if (!iv_set) {
-    iv_set = true;
-    status = crypto.generate_iv (iv, 12); // 96-bit
-  }
+  string str = string (name);
+
+  memcpy (iv, iv_map[str], CRYPTO_MEM_IV_SIZE);
+
   return status;
 }
+
 core_status_t
-auth (uint8_t *key_ptr, size_t len)
+create_iv (uint8_t *iv, size_t *len)
 {
-  memcpy (key, key_ptr, len);
-  // TODO: differ with generation between enc_t
-  return set_iv ();
+  core_status_t status = CORE_OK;
+  if (!len || !iv) {
+    status = CORE_ER_WR_PARAM;
+    return status;
+  }
+  *len = CRYPTO_MEM_IV_SIZE;
+  status = crypto.generate_iv (iv, *len);
+  return status;
+}
+
+core_status_t
+auth (uint8_t *mem_key_ptr)
+{
+  core_status_t status = CORE_OK;
+  memcpy (mem_key, mem_key_ptr, CRYPTO_MEM_KEY_SIZE);
+
+  return status;
 }
 
 core_status_t
 deauth (void)
 {
-  memset (key, 0, 16);
+  memset (mem_key, 0, 16);
   return CORE_OK;
 }
 
@@ -58,7 +74,7 @@ entry_check (const char *name, uint8_t *rv)
   if (!rv) {
     return CORE_ER_WR_PARAM;
   }
-  *rv = !secret_map.count (name_str);
+  *rv = !secret_map.count (name_str) | !iv_map.count (name_str);
 
   return CORE_OK;
 }
@@ -68,16 +84,19 @@ entry_add (const char *name, const char *secret)
 {
   uint8_t rv;
   core_status_t status = CORE_OK;
-  uint8_t *sec = (uint8_t *)malloc (strlen (secret) + 1);
+  iv_t iv;
 
   entry_check (name, &rv);
-  if (sec && rv) {
-    crypto.encrypt_aes128gcm (key, (uint8_t *)secret, strlen (secret) + 1, sec, iv, 12, tag);
-    secret_map[name] = string ((char *)sec);
+  if (rv) {
+    crypto.generate_iv (iv, CRYPTO_MEM_IV_SIZE);
+    memcpy (iv_map[name], iv, CRYPTO_MEM_IV_SIZE);
+
+    crypto.encrypt_aes128gcm (mem_key, (uint8_t *)secret, sizeof (secret), secret_map[name], iv_map[name], 12, tag);
+
+
     return status;
   }
 
-  free (sec);
   return status;
 }
 
@@ -87,39 +106,61 @@ entry_del (const char *name)
   core_status_t status = CORE_OK;
   string name_str = string (name);
 
-  // erase by key
+  // erase by mem_key
   secret_map.erase (name_str);
+  iv_map.erase (name_str);
 
   return status;
 }
 
+//
+// fetching secret
+//
 core_status_t
-entry_find (const char *name, char *secret)
+fetch_encrypted_secret (const char *name, uint8_t *secret)
 {
-  uint8_t rv;
+  core_status_t status = CORE_OK;
+  string str = string (name);
+
+  memcpy (secret, secret_map[str], MAX_SECRET_LEN);
+  return status;
+}
+
+core_status_t
+fetch_decrypted_secret (const char *name, char *secret)
+{
+  char res[MAX_SECRET_LEN];
   core_status_t status = CORE_OK;
   string name_str = string (name);
-  status = entry_check (name, &rv);
-  if (status != CORE_OK) {
-    return status;
-  }
+  uint8_t *ptr = secret_map[name_str];
 
-  // TODO: implement checking, etc
-  return status;
-}
+  crypto.decrypt_aes128gcm (mem_key, (uint8_t *)ptr, strlen ((const char *)ptr), (uint8_t *)res, iv_map[name], 12, tag);
 
-core_status_t
-map_dump (uint8_t *content, size_t *len)
-{
-  core_status_t status = CORE_OK;
+  memcpy (secret, res, strlen (res));
 
   return status;
 }
 
+//
+// loading from file
+//
 core_status_t
-map_load (uint8_t *content, size_t *len)
+load_to_sec_map (const char *name, const uint8_t *secret)
 {
   core_status_t status = CORE_OK;
+  string str_name = string (name);
+
+  memcpy (secret_map[str_name], secret, MAX_SECRET_LEN);
+
+  return status;
+}
+
+core_status_t
+load_to_iv_map (const char *name, const uint8_t *iv)
+{
+  core_status_t status = CORE_OK;
+  string str_name = string (name);
+  memcpy (iv_map[str_name], iv, CRYPTO_MEM_IV_SIZE);
 
   return status;
 }

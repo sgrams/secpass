@@ -7,19 +7,29 @@
 enclave {
   from "sgx_tstdc.edl" import *;
   trusted {
+    // key-retrieval
+    // public uint64_t key_retrieve ()
+
     // authentication
-    public uint64_t auth ([user_check] uint8_t *key, size_t len);
+    public uint64_t auth ([user_check] uint8_t *key);
     public uint64_t deauth (void);
 
-    // entry
-    public uint64_t entry_add ([in, string] const char *name, [in, string] const char *secret);
-    public uint64_t entry_del ([in, string] const char *name);
-    public uint64_t entry_find ([in, string] const char *name, [in, out, string] char *secret);
-    public uint64_t entry_check ([in, string] const char *name, [out, size=1]uint8_t *rv);
+    // crypto
+    public uint64_t create_iv ([user_check] uint8_t *iv, [user_check] size_t *len);
+    public uint64_t get_iv ([in, string] const char *name, [user_check] uint8_t *iv, [user_check] size_t *len);
 
-    // serialization
-    public uint64_t map_dump ([in, out] uint8_t *content, [out]size_t *len);
-    public uint64_t map_load ([in, out] uint8_t *content, [in]size_t *len);
+    // adding / deleting / checking for secret
+    public uint64_t entry_add   ([in, string] const char *name, [in, string]  const char *secret);
+    public uint64_t entry_check ([in, string] const char *name, [out, size=1] uint8_t *rv);
+    public uint64_t entry_del   ([in, string] const char *name);
+
+    // fetching secret
+    public uint64_t fetch_encrypted_secret ([in, string] const char *name, [user_check] uint8_t *secret);
+    public uint64_t fetch_decrypted_secret ([in, string] const char *name, [user_check] char *secret);
+
+    // maps support
+    public uint64_t load_to_sec_map ([in, string] const char *name, [user_check] const uint8_t *secret);
+    public uint64_t load_to_iv_map ([in, string] const char *name, [user_check] const uint8_t *iv);
   };
 
   untrusted {

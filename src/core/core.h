@@ -30,13 +30,4 @@ typedef uint64_t core_status_t;
 #define CORE_ER_CMAC     0x05
 #define CORE_ER_UNDEF    0xFF
 
-// iv_t: 8 bit variable containing init vector
-typedef uint8_t iv_t[12]; // 12 * 8 bit = 96 bit IV
-
-// secret_t: string containing the secret
-typedef string secret_t;
-
-// key_128_bit_t: 128 bit variable containing the master key
-typedef uint8_t key_128bit_t[16];
-
 #endif // _SECPASS_CORE_H

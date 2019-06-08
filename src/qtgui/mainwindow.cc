@@ -17,7 +17,7 @@
 #include <string>
 
 #include "../common/secpass.h"
-#include "../common/wrapper.h"
+#include "../common/bridge.h"
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -47,9 +47,6 @@ MainWindow::MainWindow (QWidget *parent) :
 
   // set title
   setWindowTitle (QString ("secpass %1").arg(SECPASS_VERSION));
-
-  initialize_enclave ();
-  destroy_enclave ();
 }
 
 /*!
@@ -122,6 +119,5 @@ MainWindow::on_actionHomepage_triggered ()
  */
 MainWindow::~MainWindow ()
 {
-  destroy_enclave ();
   delete ui;
 }

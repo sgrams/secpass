@@ -7,11 +7,14 @@
 #include "ui.h"
 #include "draw.h"
 #include "window.h"
+#include "clipboard.h"
 
 #include "../common/secpass.h"
 #include "../common/bridge.h"
 
+#include <unistd.h>
 #include <iostream>
+#include <cstdio>
 #include <algorithm>
 #include <string>
 #include <sstream>
@@ -20,35 +23,46 @@
 using namespace std;
 
 int
-Ui::main_loop (int idle_time, string filepath)
+Ui::main_loop (int idle_time, string filepath, string key_filepath)
 {
   bool file_open = false;
   int status = 0;
   unsigned int pos = 0;
   uint8_t c;
+  string auth_key;
+  string master_key;
 
   vector<string> entries;
 
+
   Draw::init ();
 
-  string auth_key;
-  timeout (10000000);
+  status = br_file_check (filepath);
+  if (BRIDGE_ER_WR_EXT == status) {
+    status = UI_ERR_FILE;
+    goto MAIN_LOOP_EXIT;
+  }
+
   Draw::draw_auth_popup (filepath, &auth_key);
-  //status = br_file_open (auth_key, filepath);
+
+  // perform KDF if file provided
+  master_key = auth_key;
+
+  if (BRIDGE_ER_WR_FILE == status) {
+    br_file_create (filepath, master_key); // create file if does not exist
+  }
+
+  status = br_file_open (master_key, filepath);
   if (0 != status) {
+    status = UI_ERR_FILE;
     goto MAIN_LOOP_EXIT;
   }
   file_open = true;
 
-  // get entries
-  entries.push_back ("test1sdasdasadasdsadsadjlksajdlksajdhgdsnjgkdndkjsnkjfnesfnasssssssssssssssssssssssssssssssssaaaaaaaaaasdasdasd123123123123123123");
-  entries.push_back ("test2");
-  entries.push_back ("test3");
-
   // main loop
   while (1<2)
   {
-    //br_fetch_names (&entries);
+    br_fetch_names (&entries); // get entries from enclave
     Draw::draw (entries, filepath, pos);
     timeout (idle_time * 1000); // convert time to ms
     c = getch ();
@@ -63,7 +77,7 @@ Ui::main_loop (int idle_time, string filepath)
 
 MAIN_LOOP_EXIT:
   if (file_open) {
-    // save file
+    br_file_save (filepath);
   }
   Draw::stop ();
   return status;
@@ -72,6 +86,8 @@ MAIN_LOOP_EXIT:
 int
 Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements)
 {
+  std::string secret;
+  std::string new_secret_name;
   std::string new_secret;
   std::string name_to_find;
   noecho ();
@@ -82,6 +98,9 @@ Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned
     case NEW_KEY:
       // fill a new secret and add to enclave
       // and save to file
+      Draw::draw_new_entry (&new_secret_name, &new_secret);
+      br_secret_add (new_secret_name, new_secret);
+      // call bridge operation
       break;
     case EDIT_KEY:
       // open a secret, add to enclave, check if name and secret is ok
@@ -106,20 +125,24 @@ Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned
       Draw::draw_find_entry (&name_to_find);
       for (size_t i = 0; i < entries.size (); ++i)
       {
-        if (entries.at (i) == name_to_find) {
+        if (entries.at (i).find (name_to_find) == 0) {
           pos = i;
           break;
         }
       }
       break;
 
+    case COPY_KEY:
+      name_to_find = entries.at (pos);
+      br_secret_fetch (name_to_find, &secret);
+      //Clipboard::copy (secret);
+      printw ("%s", secret.c_str ());
+
+      break;
     case RESIZE_KEY:
       Draw::stop ();
       Draw::init ();
       break;
-
   }
-
-  echo ();
   return 0;
 }

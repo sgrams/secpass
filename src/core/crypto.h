@@ -9,8 +9,12 @@
 #include "core.h"
 
 #define SECPASS_CRYPTO_VERSION 0x001
-#define CRYPTO_IV_SIZE  12
-#define CRYPTO_KEY_SIZE 16
+
+#define CRYPTO_MEM_IV_SIZE   12 // 96 bit
+#define CRYPTO_MEM_KEY_SIZE  16 // 128 bit
+#define CRYPTO_FILE_IV_SIZE  16 // 128 bit
+#define CRYPTO_FILE_KEY_SIZE 32 // 256 bit
+
 // Error definitions
 class core_crypto_c {
   public:

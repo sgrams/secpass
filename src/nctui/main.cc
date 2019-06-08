@@ -39,6 +39,7 @@ main (int argc, char *argv[])
   int idle_time = DEFAULT_IDLE_TIME;
   int c;
   std::vector<std::string> paths;
+  string key_filepath;
 
   // parse command line parameters
   if (argc < 2) {
@@ -85,7 +86,11 @@ main (int argc, char *argv[])
     goto MAIN_SECPASS_EXIT;
   }
 
-  status = Ui::main_loop (idle_time, paths.at(0));
+  if (paths.size () > 1) {
+    key_filepath = paths.at(1);
+  }
+
+  status = Ui::main_loop (idle_time, paths.at(0), key_filepath);
   if (UI_OK != status) {
     if (UI_ERR_FILE == status) {
       std::cout << "Unable to open `" << paths.at(0) << "`. The database is broken or the master password is invalid.\n";

@@ -130,6 +130,8 @@ Draw::draw_auth_popup (string filepath, string *key) {
 
   curs_set (0);
   auth_window = new Window (x, y, 50, 10, "authorization", true);
+
+  auth_window->color (BORDER_COLOR_PAIR, true);
   draw_title (filepath);
   auth_window->get_password ("Please enter master password:", key);
 
@@ -140,8 +142,18 @@ Draw::draw_auth_popup (string filepath, string *key) {
 void
 Draw::draw_find_entry (string *str) {
   find_window->clear ();
+  find_window->color (BORDER_COLOR_PAIR, true);
   find_window->draw ();
   find_window->get_input ("Type a name of the secret", str);
+}
+
+void
+Draw::draw_new_entry (string *str, string *sec) {
+  input_window->clear ();
+  input_window->color (BORDER_COLOR_PAIR, true);
+  input_window->draw ();
+  input_window->get_input ("Type a name of new secret", str);
+  input_window->get_password ("Type the secret", sec);
 }
 
 void

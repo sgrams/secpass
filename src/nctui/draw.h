@@ -47,12 +47,14 @@ const uint8_t REMOVE_KEY = (uint8_t)'d';
 const uint8_t EDIT_KEY   = (uint8_t)'e';
 const uint8_t FIND_KEY   = (uint8_t)'/';
 const uint8_t RESIZE_KEY = (uint8_t)KEY_RESIZE;
+const uint8_t COPY_KEY   = (uint8_t)'\n';
 
 namespace Draw {
   void init ();
   void draw (vector<string> entries, string filepath, uint32_t selected);
   void draw_auth_popup (string filepath, string *key);
   void draw_find_entry (string *str);
+  void draw_new_entry (string *str, string *sec);
   void stop ();
 }
 #endif // NCTUI_DRAW_H

@@ -39,6 +39,7 @@ add_library (core SHARED
   crypto.h
   core_t.c
   core_u.h
+  ../common/json.hpp
   )
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SGX_COMMON_CFLAGS} -nostdinc -fvisibility=hidden -fpie -fstack-protector")
