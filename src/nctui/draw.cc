@@ -35,6 +35,7 @@ Window *title_window;
 Window *entries_window;
 Window *details_window;
 Window *control_window;
+Window *delete_window;
 Window *input_window;
 Window *find_window;
 Window *auth_window;
@@ -91,6 +92,7 @@ Draw::init ()
   entries_window = new Window (start_x, start_y, width, height, "secrets");
   details_window = new Window (start_x, start_y, width, height, "details");
   control_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "controls");
+  delete_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "delete entry");
   input_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "add entry");
   find_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "find entry");
 
@@ -113,6 +115,7 @@ Draw::stop ()
   delete title_window;
   delete entries_window;
   delete control_window;
+  delete delete_window;
   delete input_window;
   delete find_window;
   delete details_window;
@@ -157,6 +160,14 @@ Draw::draw_new_entry (string *str, string *sec) {
 }
 
 void
+Draw::draw_remove_entry (bool *to_be_closed) {
+  input_window->clear ();
+  input_window->color (BORDER_COLOR_PAIR, true);
+  input_window->draw ();
+  input_window->get_bool ("Are you sure you want to delete this item?", to_be_closed);
+}
+
+void
 draw_title (string filepath)
 {
   title_window->clear ();
@@ -178,7 +189,8 @@ draw_controls ()
   stringstream line;
 
   control_window->move (0, 0);
-  line << "[" << ((unsigned char) EXIT_KEY) << "] quit secpass";
+  line << "[" << ((unsigned char) EXIT_KEY) << "] quit secpass : ";
+  line << "[" << ((unsigned char) SAVE_KEY) << "] save file";
   control_window->print(line.str());
   line.str("");
 

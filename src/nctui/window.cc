@@ -38,6 +38,41 @@ Window::~Window ()
 }
 
 void
+Window::get_bool (string message, bool *to_be_closed)
+{
+  char c;
+  noecho ();
+
+  if (!to_be_closed) {
+    return;
+  }
+
+  bool type = true;
+  while (type) {
+    move (0, 0);
+    wprintw (this->get_window (), "%s", message.c_str ());
+    move (0, 1);
+    wprintw (this->get_window (), "press [y/n]");
+    draw ();
+
+    switch (c = getch ()) {
+      case 'y':
+        *to_be_closed = true;
+        type = false;
+        break;
+      case 'n':
+        *to_be_closed = false;
+        break;
+      default:
+        break;
+    }
+  }
+
+  c = 0;
+  return;
+}
+
+void
 Window::get_password (string message, string *buf)
 {
   bool type = true;

@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <vector>
 #include <algorithm>
+#include <openssl/sha.h>
 
 using namespace std;
 
@@ -36,6 +37,24 @@ br_enclave_close (void)
     return BRIDGE_ER_DESTROY;
   }
   return BRIDGE_OK;
+}
+
+bridge_status_t
+br_derive_key_argon2 (const char *password, const char *filepath, uint8_t *salt, size_t salt_len, uint8_t *key, size_t key_len)
+{
+  bridge_status_t status = BRIDGE_OK;
+  uint8_t *file_hash = NULL;
+
+  if (filepath != NULL) {
+    file_hash = (uint8_t *)malloc (KDF_KEYFILE_HASH_SIZE);
+  }
+
+  if (file_hash) {
+    memset (file_hash, 0, KDF_KEYFILE_HASH_SIZE);
+    free (file_hash);
+  }
+
+  return status;
 }
 
 bridge_status_t

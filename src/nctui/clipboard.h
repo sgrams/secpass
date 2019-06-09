@@ -10,7 +10,7 @@
 using namespace std;
 
 namespace Clipboard {
-  void copy (string to_cpy);
-  void clipclose ();
+  void cb_open ();
+  void cb_close ();
 };
 #endif // _SECPASS_NCTUI_CLIPBOARD_H

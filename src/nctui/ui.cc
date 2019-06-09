@@ -69,7 +69,7 @@ Ui::main_loop (int idle_time, string filepath, string key_filepath)
       goto MAIN_LOOP_EXIT;
     }
     // break main loop if quit issued
-    if (handle_input (entries, c, pos, entries.size ())) {
+    if (handle_input (filepath, entries, c, pos, entries.size ())) {
       break;
     }
   }
@@ -83,13 +83,14 @@ MAIN_LOOP_EXIT:
 }
 
 int
-Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements)
+Ui::handle_input (string filepath, vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements)
 {
   static char secret[MAX_SECRET_LEN] = {0};
 
   std::string new_secret_name;
   std::string new_secret;
   std::string name_to_find;
+  bool to_be_deleted;
   noecho ();
 
   switch (c) {
@@ -98,12 +99,27 @@ Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned
 
     case NEW_KEY:
       Draw::draw_new_entry (&new_secret_name, &new_secret);
+      if (new_secret_name.size () > MAX_NAME_LEN) {
+        new_secret_name.resize (MAX_NAME_LEN);
+      }
+      if (new_secret.size () > MAX_SECRET_LEN) {
+        new_secret.resize (MAX_SECRET_LEN);
+      }
+
       br_secret_add (new_secret_name, new_secret);
       break;
 
-    case EDIT_KEY:
-      // open a secret, add to enclave, check if name and secret is ok
-      // and save to file
+    case SAVE_KEY:
+      br_file_save (filepath);
+      break;
+
+    case REMOVE_KEY:
+      to_be_deleted = false;
+      Draw::draw_remove_entry (&to_be_deleted);
+      if (to_be_deleted && entries.size () > 0) {
+        br_secret_del (entries.at (pos));
+      }
+      pos = 0;
       break;
 
     case UP_KEY:
@@ -134,11 +150,16 @@ Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned
       break;
 
     case COPY_KEY:
-      name_to_find = entries.at (pos);
-      br_secret_fetch (name_to_find, secret);
-      // copy to clipboard here
-      printw ("%s", secret);
-      memset (secret, 0, MAX_SECRET_LEN);
+      if (entries.size () > 0) {
+        name_to_find = entries.at (pos);
+        br_secret_fetch (name_to_find, secret);
+        curs_set (0);
+        Clipboard::cb_open ();
+        fprintf (stdout, "%s", secret);
+        Clipboard::cb_close ();
+        curs_set (1);
+        memset (secret, 0, MAX_SECRET_LEN);
+      }
       break;
 
     case RESIZE_KEY:

@@ -11,61 +11,61 @@
 #include <sys/types.h>
 #include "clipboard.h"
 
-static pid_t proc = 0;
-int saved_stdout  = -1;
-static bool closer = false;
+static pid_t clipboard_process = 0;
+static int saved_stdout = -1;
+static bool registered_closer = false;
 
-void
-Clipboard::copy (string to_cpy)
+
+void Clipboard::cb_open ()
 {
   int pipefd[2];
 
-  if (proc > 0) {
+  if (clipboard_process > 0)
     return;
+
+  if (pipe(pipefd) < 0) {
+    exit (EXIT_FAILURE);
+  }
+  saved_stdout = dup(STDOUT_FILENO);
+  if (saved_stdout < 0) {
+    exit (EXIT_FAILURE);
   }
 
-  pipe (pipefd);
+  clipboard_process = fork();
 
-  saved_stdout = dup (STDOUT_FILENO);
-  proc = fork ();
-
-  if (proc < 0) {
-    return;
-  } else if (proc == 0) {
-
-    close (pipefd[1]);
-    dup2 (pipefd[0], STDIN_FILENO);
-    close (pipefd[0]);
-
-    execlp ("xsel", "xsel", "--clipboard", "--input", NULL);
-    execlp ("xclip", "xclip", "-selection", "clipboard", "-in", NULL);
-
-    fprintf (stdout, "%s", to_cpy.c_str ());
-  } else {
-    wait (NULL);
+  if (clipboard_process == -1) {
+    exit (EXIT_FAILURE);
   }
 
-  close (pipefd[0]);
-  dup2 (pipefd[1], STDOUT_FILENO);
-  close (pipefd[1]);
-
-  if (!closer) {
-    atexit (clipclose);
+  if (!clipboard_process) {
+    close(pipefd[1]);
+    dup2(pipefd[0], STDIN_FILENO);
+    close(pipefd[0]);
+    execlp("xclip", "xclip", "-selection", "clipboard", "-in", NULL);
+    execlp("xsel", "xsel", "--clipboard", "--input", NULL);
+    execlp("pbcopy", "pbcopy", NULL);
+    execlp("putclip", "putclip", "--dos", NULL);
   }
+  close(pipefd[0]);
+  dup2(pipefd[1], STDOUT_FILENO);
+  close(pipefd[1]);
 
-  return;
+  if (!registered_closer) {
+    atexit (cb_close);
+    registered_closer = true;
+  }
 }
 
-void
-Clipboard::clipclose ()
+void Clipboard::cb_close ()
 {
-  if (!proc || saved_stdout < 0) {
-    fflush (stdout);
-    dup2 (saved_stdout, STDOUT_FILENO);
-    close (saved_stdout);
-
-    waitpid (proc, NULL, 0);
-    proc = 0;
-    saved_stdout = -1;
+  if (!clipboard_process || saved_stdout < 0) {
+    return;
   }
+
+  fflush(stdout);
+  dup2(saved_stdout, STDOUT_FILENO);
+  close(saved_stdout);
+  waitpid(clipboard_process, NULL, 0);
+  clipboard_process = 0;
+  saved_stdout = -1;
 }

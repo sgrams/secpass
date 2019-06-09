@@ -45,11 +45,27 @@ typedef uint64_t bridge_status_t;
 #define BRIDGE_ER_FILE_CLOSE 0x0A
 #define BRIDGE_ER_UNDEF      0xFF
 
+// definitions of hash sizes and salt sizes
+#define KDF_SALT_SIZE 8  // 64 bit
+#define KDF_KEY_SIZE  16 // 256 bit
+#define KDF_KEYFILE_HASH_SIZE 16 // 256 bit
+
 bridge_status_t
 br_enclave_init (void);
 
 bridge_status_t
 br_enclave_close (void);
+
+
+bridge_status_t
+br_derive_key_argon2 (
+  const char *password, // IN
+  const char *filepath, // IN
+  uint8_t    *salt,     // OUT
+  size_t     salt_len,  // IN
+  uint8_t    *key,      // OUT
+  size_t     key_len    // IN
+  );
 
 bridge_status_t
 br_file_check (string filepath);

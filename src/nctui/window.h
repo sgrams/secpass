@@ -51,5 +51,6 @@ class Window {
 
     void get_password (string message, string *buf);
     void get_input    (string message, string *buf);
+    void get_bool (string message, bool *to_be_closed);
 };
 #endif // _SECPASS_NCTUI_WINDOW_H
