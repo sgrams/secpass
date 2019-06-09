@@ -28,8 +28,7 @@ enclave {
     public uint64_t fetch_decrypted_secret ([in, string] const char *name, [user_check] char *secret);
 
     // maps support
-    public uint64_t load_to_sec_map ([in, string] const char *name, [user_check] const uint8_t *secret);
-    public uint64_t load_to_iv_map ([in, string] const char *name, [user_check] const uint8_t *iv);
+    public uint64_t load_to_sec_map ([in, string] const char *name, [user_check] const char *secret);
   };
 
   untrusted {

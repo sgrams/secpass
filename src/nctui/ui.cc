@@ -34,7 +34,6 @@ Ui::main_loop (int idle_time, string filepath, string key_filepath)
 
   vector<string> entries;
 
-
   Draw::init ();
 
   status = br_file_check (filepath);
@@ -86,7 +85,8 @@ MAIN_LOOP_EXIT:
 int
 Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements)
 {
-  std::string secret;
+  static char secret[MAX_SECRET_LEN] = {0};
+
   std::string new_secret_name;
   std::string new_secret;
   std::string name_to_find;
@@ -95,22 +95,23 @@ Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned
   switch (c) {
     case EXIT_KEY:
       return 1;
+
     case NEW_KEY:
-      // fill a new secret and add to enclave
-      // and save to file
       Draw::draw_new_entry (&new_secret_name, &new_secret);
       br_secret_add (new_secret_name, new_secret);
-      // call bridge operation
       break;
+
     case EDIT_KEY:
       // open a secret, add to enclave, check if name and secret is ok
       // and save to file
       break;
+
     case UP_KEY:
       if (0 != pos) {
         pos--;
       }
       break;
+
     case DOWN_KEY:
       if (0 != elements) {
         pos++;
@@ -134,11 +135,12 @@ Ui::handle_input (vector<string> entries, uint8_t c, unsigned int &pos, unsigned
 
     case COPY_KEY:
       name_to_find = entries.at (pos);
-      br_secret_fetch (name_to_find, &secret);
-      //Clipboard::copy (secret);
-      printw ("%s", secret.c_str ());
-
+      br_secret_fetch (name_to_find, secret);
+      // copy to clipboard here
+      printw ("%s", secret);
+      memset (secret, 0, MAX_SECRET_LEN);
       break;
+
     case RESIZE_KEY:
       Draw::stop ();
       Draw::init ();

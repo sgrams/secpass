@@ -17,15 +17,12 @@
 #include "string.h"
 
 #include <map>
+#include <cstring>
 #include <string>
 
 core_crypto_c crypto;
-
-static std::map<string, uint8_t[MAX_SECRET_LEN]> secret_map;
-static std::map<string, iv_t>   iv_map;
-
+static std::map<string, uint8_t[MAX_SECRET_SIZ]> secret_map;
 static key_128bit_t mem_key;
-uint8_t      tag[16];
 
 core_status_t
 get_iv (const char *name, uint8_t *iv, size_t *len)
@@ -33,7 +30,7 @@ get_iv (const char *name, uint8_t *iv, size_t *len)
   core_status_t status = CORE_OK;
   string str = string (name);
 
-  memcpy (iv, iv_map[str], CRYPTO_MEM_IV_SIZE);
+  memcpy (iv, secret_map[str], CRYPTO_MEM_IV_SIZE);
 
   return status;
 }
@@ -46,11 +43,13 @@ create_iv (uint8_t *iv, size_t *len)
     status = CORE_ER_WR_PARAM;
     return status;
   }
+
   *len = CRYPTO_MEM_IV_SIZE;
   status = crypto.generate_iv (iv, *len);
   return status;
 }
 
+// authorization
 core_status_t
 auth (uint8_t *mem_key_ptr)
 {
@@ -63,10 +62,11 @@ auth (uint8_t *mem_key_ptr)
 core_status_t
 deauth (void)
 {
-  memset (mem_key, 0, 16);
+  memset (mem_key, 0, CRYPTO_MEM_KEY_SIZE);
   return CORE_OK;
 }
 
+// entries
 core_status_t
 entry_check (const char *name, uint8_t *rv)
 {
@@ -74,7 +74,7 @@ entry_check (const char *name, uint8_t *rv)
   if (!rv) {
     return CORE_ER_WR_PARAM;
   }
-  *rv = !secret_map.count (name_str) | !iv_map.count (name_str);
+  *rv = !secret_map.count (name_str);
 
   return CORE_OK;
 }
@@ -82,19 +82,29 @@ entry_check (const char *name, uint8_t *rv)
 core_status_t
 entry_add (const char *name, const char *secret)
 {
-  uint8_t rv;
   core_status_t status = CORE_OK;
-  iv_t iv;
+  uint8_t rv;
 
   entry_check (name, &rv);
   if (rv) {
-    crypto.generate_iv (iv, CRYPTO_MEM_IV_SIZE);
-    memcpy (iv_map[name], iv, CRYPTO_MEM_IV_SIZE);
+    uint8_t *ptr_iv  = secret_map[name];
+    uint8_t *ptr_mac = ptr_iv  + CRYPTO_MEM_IV_SIZE;
+    uint8_t *ptr_ct  = ptr_mac + CRYPTO_MEM_TAG_SIZE;
 
-    crypto.encrypt_aes128gcm (mem_key, (uint8_t *)secret, sizeof (secret), secret_map[name], iv_map[name], 12, tag);
+    status = crypto.generate_iv (ptr_iv, CRYPTO_MEM_IV_SIZE);
+    if (0 != status) {
+      return status;
+    }
 
-
-    return status;
+    status = crypto.encrypt_aes128gcm (
+      mem_key, // key
+      (uint8_t *)secret, // data_in
+      MAX_SECRET_LEN, // ct len
+      ptr_ct, // ct
+      ptr_iv, // iv
+      CRYPTO_MEM_IV_SIZE, // iv len
+      (sgx_aes_gcm_128bit_tag_t *)ptr_mac// tag
+      );
   }
 
   return status;
@@ -108,7 +118,6 @@ entry_del (const char *name)
 
   // erase by mem_key
   secret_map.erase (name_str);
-  iv_map.erase (name_str);
 
   return status;
 }
@@ -122,21 +131,32 @@ fetch_encrypted_secret (const char *name, uint8_t *secret)
   core_status_t status = CORE_OK;
   string str = string (name);
 
-  memcpy (secret, secret_map[str], MAX_SECRET_LEN);
+  memcpy (secret, secret_map[str], MAX_SECRET_SIZ);
+
   return status;
 }
 
 core_status_t
 fetch_decrypted_secret (const char *name, char *secret)
 {
-  char res[MAX_SECRET_LEN];
   core_status_t status = CORE_OK;
-  string name_str = string (name);
-  uint8_t *ptr = secret_map[name_str];
+  char          ret[MAX_SECRET_LEN] = {0};
 
-  crypto.decrypt_aes128gcm (mem_key, (uint8_t *)ptr, strlen ((const char *)ptr), (uint8_t *)res, iv_map[name], 12, tag);
+  uint8_t *ptr_iv  = secret_map[name];
+  uint8_t *ptr_mac = ptr_iv  + CRYPTO_MEM_IV_SIZE;
+  uint8_t *ptr_ct  = ptr_mac + CRYPTO_MEM_TAG_SIZE;
 
-  memcpy (secret, res, strlen (res));
+  status = crypto.decrypt_aes128gcm (
+    mem_key, // key
+    ptr_ct,
+    MAX_SECRET_LEN, // ct len
+    (uint8_t *)ret,
+    ptr_iv, // iv
+    CRYPTO_MEM_IV_SIZE, // iv len
+    (sgx_aes_gcm_128bit_tag_t *)ptr_mac // tag
+    );
+
+  memcpy (secret, ret, MAX_SECRET_LEN);
 
   return status;
 }
@@ -145,22 +165,12 @@ fetch_decrypted_secret (const char *name, char *secret)
 // loading from file
 //
 core_status_t
-load_to_sec_map (const char *name, const uint8_t *secret)
+load_to_sec_map (const char *name, const char *secret)
 {
   core_status_t status = CORE_OK;
   string str_name = string (name);
 
-  memcpy (secret_map[str_name], secret, MAX_SECRET_LEN);
-
-  return status;
-}
-
-core_status_t
-load_to_iv_map (const char *name, const uint8_t *iv)
-{
-  core_status_t status = CORE_OK;
-  string str_name = string (name);
-  memcpy (iv_map[str_name], iv, CRYPTO_MEM_IV_SIZE);
+  memcpy (secret_map[str_name], secret, MAX_SECRET_SIZ);
 
   return status;
 }

@@ -6,6 +6,7 @@
  */
 #include "bridge.h"
 #include "file.h"
+#include "argon2.h"
 #include "../core/crypto.h"
 
 #include <sys/stat.h>
@@ -49,15 +50,14 @@ br_secret_add (string name, string secret)
   }
 
   const char *str = name.c_str ();
-  char       *sec = new char[secret.length () + 1];
-  strcpy (sec, secret.c_str ());
+  char sec[MAX_SECRET_LEN] = {0};
+  strncpy (sec, secret.c_str (), secret.size () + 1);
 
   if (SGX_SUCCESS != entry_add (global_eid, &rv, str, sec)) {
     return BRIDGE_ER_ADD;
   }
   names.push_back (name);
 
-  delete[] sec;
   return status;
 }
 
@@ -99,18 +99,15 @@ br_secret_check (string name, uint8_t *rv) {
 }
 
 bridge_status_t
-br_secret_fetch (string name, string *secret)
+br_secret_fetch (string name, char *secret)
 {
   uint64_t rv;
   const char *str = name.c_str ();
-  char buf[MAX_SECRET_LEN];
 
-  if (SGX_SUCCESS != fetch_decrypted_secret (global_eid, &rv, str, buf)) {
+  if (SGX_SUCCESS != fetch_decrypted_secret (global_eid, &rv, str, secret)) {
     return BRIDGE_ER_FETCH;
   }
 
-  *secret = string (buf);
-  memset (buf, 0, sizeof (buf));
   return rv;
 }
 
@@ -166,10 +163,9 @@ br_file_open (string master_key, string filepath)
   in >> data;
 
   string  name;
-  uint8_t secret[MAX_SECRET_LEN];
-  uint8_t iv[CRYPTO_MEM_IV_SIZE];
+  uint8_t secret[MAX_SECRET_SIZ] = {0};
 
-  if (SGX_SUCCESS != auth (global_eid, &rv, key)) {
+  if (SGX_SUCCESS != auth (global_eid, &rv, mem_key)) {
     status = BRIDGE_ER_INIT;
     return status;
   }
@@ -182,16 +178,9 @@ br_file_open (string master_key, string filepath)
     names.push_back (name);
     auto &val = el.value ();
 
-    val.at("sc").get_to (secret);
-    val.at("iv").get_to (iv);
+    val.get_to (secret);
 
-    /*if (SGX_SUCCESS != load_to_sec_map (global_eid, &rv, name.c_str (), secret))
-    {
-      status = -1;
-      return status;
-    }*/
-
-    if (SGX_SUCCESS != load_to_iv_map (global_eid, &rv, name.c_str (), iv))
+    if (SGX_SUCCESS != load_to_sec_map (global_eid, &rv, name.c_str (), (char *)secret))
     {
       status = -1;
       return status;
@@ -215,10 +204,8 @@ br_file_save (string filepath)
   data["kdf"] = KDF_ARGON2;
   data["enc"] = ENC_AES128GCM;
 
-  size_t   len;
-  uint8_t  secret[MAX_SECRET_LEN];
-  iv_t     iv;
   uint64_t rv;
+  uint8_t  secret[MAX_SECRET_SIZ] = {0};
 
   for (auto &el : names)
   {
@@ -226,12 +213,7 @@ br_file_save (string filepath)
       return BRIDGE_ER_WR_FILE;
     }
 
-    if (SGX_SUCCESS != get_iv (global_eid, &rv, el.c_str (), iv, &len)) {
-      return BRIDGE_ER_FILE_CLOSE;
-    }
-
-    data["entries"][el]["sc"] = secret;
-    data["entries"][el]["iv"] = iv;
+    data["entries"][el] = secret;
   }
 
   string json_data = data.dump ();

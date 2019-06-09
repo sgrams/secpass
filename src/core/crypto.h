@@ -7,6 +7,8 @@
 #ifndef _SECPASS_CORE_CRYPTO_H
 #define _SECPASS_CORE_CRYPTO_H
 #include "core.h"
+#include <sgx.h>
+#include "sgx_tcrypto.h"
 
 #define SECPASS_CRYPTO_VERSION 0x001
 
@@ -14,6 +16,8 @@
 #define CRYPTO_MEM_KEY_SIZE  16 // 128 bit
 #define CRYPTO_FILE_IV_SIZE  16 // 128 bit
 #define CRYPTO_FILE_KEY_SIZE 32 // 256 bit
+
+#define CRYPTO_MEM_TAG_SIZE  SGX_AESGCM_MAC_SIZE // 128 bit
 
 // Error definitions
 class core_crypto_c {
@@ -30,7 +34,7 @@ class core_crypto_c {
     uint8_t  *out_data,
     uint8_t  *iv, // 96 bit init vector
     size_t   iv_len,
-    uint8_t  *tag
+    sgx_aes_gcm_128bit_tag_t *tag
   );
 
   core_status_t
@@ -41,7 +45,7 @@ class core_crypto_c {
     uint8_t  *out_data,
     uint8_t  *iv, // 96 bit init vector
     size_t   iv_len,
-    uint8_t  *tag
+    sgx_aes_gcm_128bit_tag_t *tag
   );
 
   core_status_t

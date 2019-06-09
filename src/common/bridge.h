@@ -79,7 +79,7 @@ bridge_status_t
 br_secret_check (string name, uint8_t *rv);
 
 bridge_status_t
-br_secret_fetch (string name, string *secret);
+br_secret_fetch (string name, char *secret);
 
 bridge_status_t
 br_fetch_names (vector<string> *rv);

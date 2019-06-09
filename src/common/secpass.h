@@ -11,8 +11,10 @@
 #define SECPASS_AUTHORS  "Stanisław Grams <sjg@fmdx.pl>"
 #define SECPASS_HOMEPAGE "https://secpass.org/"
 
-#define MAX_NAME_LEN 1024
-#define MAX_SECRET_LEN 4096
+#define MAX_NAME_LEN   1024
+#define MAX_SECRET_LEN 2048
+#define MAX_SECRET_SIZ 4096
+
 #define DEFAULT_IDLE_TIME 60 // time in seconds
 #define DEFAULT_FILE_EXTENSION "secdb"
 
