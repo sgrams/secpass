@@ -22,8 +22,16 @@
 
 core_crypto_c crypto;
 static std::map<string, uint8_t[MAX_SECRET_SIZ]> secret_map;
-static key_128bit_t mem_key;
+static key_256bit_t mem_key;
 
+core_status_t
+get_key (uint8_t *key, size_t key_len)
+{
+  core_status_t status = CORE_OK;
+  memcpy (key, mem_key, key_len);
+
+  return status;
+}
 core_status_t
 get_iv (const char *name, uint8_t *iv, size_t *len)
 {
@@ -36,7 +44,20 @@ get_iv (const char *name, uint8_t *iv, size_t *len)
 }
 
 core_status_t
-create_iv (uint8_t *iv, size_t *len)
+get_salt (uint8_t *salt, size_t len)
+{
+  core_status_t status = CORE_OK;
+  if (!salt || len <= 0) {
+    status = CORE_ER_WR_PARAM;
+    return status;
+  }
+
+  crypto.generate_iv (salt, len);
+  return status;
+}
+
+core_status_t
+create_iv (uint8_t *iv, size_t len)
 {
   core_status_t status = CORE_OK;
   if (!len || !iv) {
@@ -44,8 +65,7 @@ create_iv (uint8_t *iv, size_t *len)
     return status;
   }
 
-  *len = CRYPTO_MEM_IV_SIZE;
-  status = crypto.generate_iv (iv, *len);
+  status = crypto.generate_iv (iv, len);
   return status;
 }
 
@@ -54,7 +74,7 @@ core_status_t
 auth (uint8_t *mem_key_ptr)
 {
   core_status_t status = CORE_OK;
-  memcpy (mem_key, mem_key_ptr, CRYPTO_MEM_KEY_SIZE);
+  memcpy (mem_key, mem_key_ptr, CRYPTO_FILE_KEY_SIZE);
 
   return status;
 }
@@ -62,7 +82,7 @@ auth (uint8_t *mem_key_ptr)
 core_status_t
 deauth (void)
 {
-  memset (mem_key, 0, CRYPTO_MEM_KEY_SIZE);
+  memset (mem_key, 0, CRYPTO_FILE_KEY_SIZE);
   return CORE_OK;
 }
 

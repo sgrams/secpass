@@ -56,6 +56,7 @@ namespace Draw {
   void draw_find_entry (string *str);
   void draw_new_entry (string *str, string *sec);
   void draw_remove_entry (bool *to_be_closed);
+  void print_message (const char *msg);
   void stop ();
 }
 #endif // NCTUI_DRAW_H

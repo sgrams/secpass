@@ -17,6 +17,10 @@ set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
+# check for Argon2 KDF & OpenSSL
+find_package (Argon2 REQUIRED)
+find_package (OpenSSL REQUIRED)
+
 # include src dirs
 include_directories (
   $(CMAKE_CURRENT_SOURCE_DIR)
@@ -70,5 +74,7 @@ target_link_libraries (
   Qt5::Core
   Qt5::Widgets
   Qt5::Svg
+  ${ARGON2_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
   -L${SGX_LIBRARY_PATH} ${SGX_URTS_LIB} ${SGX_USVC_LIB}
   )

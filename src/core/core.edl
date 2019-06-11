@@ -8,15 +8,16 @@ enclave {
   from "sgx_tstdc.edl" import *;
   trusted {
     // key-retrieval
-    // public uint64_t key_retrieve ()
+    public uint64_t get_key ([user_check]uint8_t *key, size_t key_len);
 
     // authentication
     public uint64_t auth ([user_check] uint8_t *key);
     public uint64_t deauth (void);
 
     // crypto
-    public uint64_t create_iv ([user_check] uint8_t *iv, [user_check] size_t *len);
+    public uint64_t create_iv ([user_check] uint8_t *iv, size_t len);
     public uint64_t get_iv ([in, string] const char *name, [user_check] uint8_t *iv, [user_check] size_t *len);
+    public uint64_t get_salt ([user_check] uint8_t *salt, size_t salt_len);
 
     // adding / deleting / checking for secret
     public uint64_t entry_add   ([in, string] const char *name, [in, string]  const char *secret);

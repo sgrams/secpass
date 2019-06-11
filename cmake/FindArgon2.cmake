@@ -1,0 +1,4 @@
+find_path(ARGON2_INCLUDE_DIR argon2)
+find_library(ARGON2_LIBRARIES argon2)
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(Argon2 DEFAULT_MSG ARGON2_LIBRARIES ARGON2_INCLUDE_DIR)

@@ -27,7 +27,7 @@ using namespace std;
 
 namespace Ui {
   int main_loop (int idle_time, string filepath, string key_filepath);
-  int handle_input (string filepath, vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements);
+  int handle_input (string filepath, uint8_t *salt, size_t salt_len, vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements);
 };
 
 #endif // _SECPASS_NCTUI_UI_H

@@ -6,6 +6,8 @@
 
 list (APPEND CMAKE_MODULE_PATH cmake)
 find_package (SGX REQUIRED)
+find_package (Argon2 REQUIRED)
+find_package (OpenSSL REQUIRED)
 set (CMAKE_CXX_STANDARD 11)
 
 # add src subdirs

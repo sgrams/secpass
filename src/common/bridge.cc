@@ -7,12 +7,17 @@
 #include "bridge.h"
 #include "file.h"
 #include "argon2.h"
+#include "aes.h"
 #include "../core/crypto.h"
 
 #include <sys/stat.h>
 #include <vector>
 #include <algorithm>
 #include <openssl/sha.h>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+#include <sstream>
 
 using namespace std;
 
@@ -43,15 +48,74 @@ bridge_status_t
 br_derive_key_argon2 (const char *password, const char *filepath, uint8_t *salt, size_t salt_len, uint8_t *key, size_t key_len)
 {
   bridge_status_t status = BRIDGE_OK;
-  uint8_t *file_hash = NULL;
+  size_t  source_len;
+  uint8_t *source       = NULL;
+  uint8_t *file_hash    = NULL;
+  uint8_t *derived_hash = NULL;
+
+  derived_hash = (uint8_t *)malloc (KDF_KEY_SIZE); // 256 bit
+  if (!derived_hash) {
+    return BRIDGE_ER_NOMEM;
+  }
 
   if (filepath != NULL) {
+    FILE *fp = fopen (filepath, "rb");
+    if (!fp) {
+      status = BRIDGE_ER_WR_PARAM;
+      return status;
+    }
     file_hash = (uint8_t *)malloc (KDF_KEYFILE_HASH_SIZE);
+    size_t  buf_size = 32768;
+    uint8_t buffer[buf_size];
+
+    SHA256_CTX sha256;
+    SHA256_Init (&sha256);
+
+    size_t bytes_read = 0;
+    while ((bytes_read = fread (buffer, 1, buf_size, fp)))
+    {
+      SHA256_Update (&sha256, buffer, bytes_read);
+    }
+
+    SHA256_Final (file_hash, &sha256);
+    fclose (fp);
   }
+
+  // derive with/without keyfile
+  if (filepath != NULL) {
+    source_len = strlen (password) + KDF_KEY_SIZE;
+    source = (uint8_t *)malloc (source_len);
+    memcpy (source, password, strlen (password));
+    memcpy (source + strlen (password), file_hash, KDF_KEY_SIZE);
+  } else {
+    source_len = strlen (password);
+    source = (uint8_t *)malloc (source_len);
+    memcpy (source, password, strlen (password));
+  }
+
+  uint32_t t_cost = 2; // 1-pass computation
+  uint32_t m_cost = (1<<16); // 64 MiB mem usage
+  uint32_t parallelism = 1; // number of threads
+
+  argon2i_hash_raw (
+    t_cost, m_cost,
+    parallelism,
+    source,
+    source_len,
+    salt,
+    salt_len,
+    key,
+    key_len
+    );
 
   if (file_hash) {
     memset (file_hash, 0, KDF_KEYFILE_HASH_SIZE);
     free (file_hash);
+  }
+
+  if (source) {
+    memset (source, 0, source_len);
+    free (source);
   }
 
   return status;
@@ -156,42 +220,69 @@ bridge_status_t
 br_file_exists (string filepath)
 {
   bridge_status_t status = BRIDGE_OK;
+  ifstream file;
   struct stat buffer;
 
-  if (stat (filepath.c_str (), &buffer) != 0) {
-    status = BRIDGE_ER_WR_FILE;
+  if (stat (filepath.c_str (), &buffer) == 0) {
+    status = BRIDGE_OK;
+  } else {
+    status = BRIDGE_ER_FILE_NONEX;
   }
 
   return status;
 }
 
 bridge_status_t
-br_file_open (string master_key, string filepath)
+br_file_open (uint8_t *master_key, size_t master_key_len, string filepath)
 {
   uint64_t rv;
-  key_128bit_t mem_key;
 
-  //memcpy (mem_key, master_key, 16); // 128-bit GCM key
-  memcpy (mem_key, "C1DA44CBC3CE421", 16); // 128-bit GCM key
+  uint8_t secret[MAX_SECRET_SIZ]  = {0};
+  uint8_t iv[CRYPTO_FILE_IV_SIZE] = {0};
+  size_t iv_len = CRYPTO_FILE_IV_SIZE;
 
   bridge_status_t status = BRIDGE_OK;
   ifstream in;
-  json   data;
 
+  // open file to read
   in.open (filepath, ios::binary);
-  in >> data;
 
-  string  name;
-  uint8_t secret[MAX_SECRET_SIZ] = {0};
+  // get IV
+  int iv_pos = SECPASS_MAGIC_SIZE + KDF_SALT_SIZE;
+  in.seekg (iv_pos); // move to magic+salt -> iv
+  in.read ((char *)iv, iv_len);
 
-  if (SGX_SUCCESS != auth (global_eid, &rv, mem_key)) {
-    status = BRIDGE_ER_INIT;
-    return status;
-  }
-  memset (mem_key, 0, 16);
+  // read data from file into buffer
+  string enc_buf;
+  int    len;
+  int    ct_pos = iv_pos + iv_len;
 
+  in.seekg (0, ios::end);
+  len = in.tellg ();
+  in.seekg (0, ios::beg);
+  in.clear ();
+
+  enc_buf.resize (len);
+  in.read (&enc_buf[0], len);
+  enc_buf.erase (0, ct_pos);
+
+  // perform decryption
+  string ptext;
+  EVP_add_cipher (EVP_aes_256_cbc());
+
+  ptext.resize (len);
+  aes_256_cbc_decrypt (master_key, iv, enc_buf, ptext);
+
+  // parse decrypted data
+  // convert string to json data
+  vector<uint8_t> bson_data;
+  bson_data.resize (ptext.length ());
+  copy (begin (ptext), end(ptext), begin(bson_data));
+  json            json_data = json::from_bson (bson_data);
+
+  string name;
   // TODO: read kdf, enc and version from file
-  for (auto &el : data["entries"].items ())
+  for (auto &el : json_data["en"].items ())
   {
     name = el.key ();
     names.push_back (name);
@@ -206,60 +297,226 @@ br_file_open (string master_key, string filepath)
     }
   }
 
+  json_data.clear ();
+  memset (secret, 0, MAX_SECRET_SIZ);
+  memset (iv, 0, iv_len);
+
   return status;
 }
 
 bridge_status_t
-br_file_save (string filepath)
+br_file_save (string filepath, uint8_t *salt, size_t salt_len)
 {
+  uint64_t rv;
   bridge_status_t status = BRIDGE_OK;
   ofstream out;
-  json data;
+  json json_data;
 
+  // create a new, unique and random IV
+  uint8_t iv[CRYPTO_FILE_IV_SIZE] = {0};
+  size_t iv_len = CRYPTO_FILE_IV_SIZE;
+
+  if (SGX_SUCCESS != create_iv (global_eid, &rv, iv, iv_len)) {
+    status = BRIDGE_ER_UNDEF;
+    return status;
+  }
+
+  // open file to save
   out.open (filepath, ios::binary | ios::out);
+  uint8_t magic[SECPASS_MAGIC_SIZE];
+  for (int i = 0; i < SECPASS_MAGIC_SIZE; i++)
+  {
+    magic[i] = SECPASS_MAGIC;
+  }
+
+  // wrate magic, salt, iv
+  out.write ((char *)&magic, SECPASS_MAGIC_SIZE);
+  out.write ((char *)salt, salt_len);
+  out.write ((char *)iv, iv_len);
 
   // set file json data
-  data["version"] = SECPASS_FILE_VERSION;
-  data["kdf"] = KDF_ARGON2;
-  data["enc"] = ENC_AES128GCM;
+  json_data["version"] = SECPASS_FILE_VERSION;
+  json_data["kdf"] = KDF_ARGON2;
+  json_data["enc"] = ENC_AES128GCM;
 
-  uint64_t rv;
+  // fetch secrets from enclave
   uint8_t  secret[MAX_SECRET_SIZ] = {0};
-
   for (auto &el : names)
   {
     if (SGX_SUCCESS != fetch_encrypted_secret (global_eid, &rv, el.c_str (), secret)) {
       return BRIDGE_ER_WR_FILE;
     }
-
-    data["entries"][el] = secret;
+    json_data["en"][el] = secret;
   }
 
-  string json_data = data.dump ();
-  out << data;
-  out.close ();
+  // ---
+  // AES-256-CBC encryption
+  // TODO: enable other types of encryption...
+  // ---
+
+  // fetch key from enclave
+  key_256bit_t tmp_key;
+  if (SGX_SUCCESS != get_key (global_eid, &rv, tmp_key, CRYPTO_FILE_KEY_SIZE)) {
+    status = BRIDGE_ER_FETCH;
+    return status;
+  }
+
+  // encrypt json_data string
+  vector<uint8_t> v_bson = json::to_bson (json_data);
+  string ptext, ctext;
+  ptext = string (v_bson.begin (), v_bson.end ());
+
+  EVP_add_cipher (EVP_aes_256_cbc ());
+  aes_256_cbc_encrypt (tmp_key, iv, ptext, ctext);
+
+  // save output string to file
+  out << ctext;
+
+  // clear json_data string
+  json_data.clear ();
 
   return status;
 }
 
 bridge_status_t
-br_file_create (string filepath, string master_key)
+br_file_get_init (string filepath, bool file_new, uint8_t *salt, size_t salt_len)
 {
+  uint64_t rv;
   bridge_status_t status = BRIDGE_OK;
-  ofstream out;
-  json   data;
 
-  out.open (filepath, ios::binary | ios::out);
+  if (!salt || (salt_len <= 0)) {
+    status = BRIDGE_ER_WR_PARAM;
+    return status;
+  }
 
-  // set file json data
-  data["version"] = SECPASS_FILE_VERSION;
-  data["kdf"]     = KDF_ARGON2; // only supported atm
-  data["enc"]     = ENC_AES128GCM;
+  if (file_new) {
+    if (SGX_SUCCESS != get_salt (global_eid, &rv, salt, salt_len)) {
+      status = BRIDGE_ER_UNDEF;
+    }
+    status = BRIDGE_OK;
+    return status;
+  }
 
-  string json_data = data.dump ();
+  ifstream file (filepath, ios::in | ios::binary);
+  uint8_t magic[SECPASS_MAGIC_SIZE];
+  for (int i = 0; i < SECPASS_MAGIC_SIZE; i++)
+  {
+    magic[i] = 0x00;
+  }
 
-  out << json_data;
-  out.close ();
+  file.read ((char *)&magic, SECPASS_MAGIC_SIZE);
+  file.read ((char *)salt, salt_len);
+
+  file.close ();
 
   return status;
+}
+
+bridge_status_t
+br_auth (uint8_t *master_key, size_t master_key_len)
+{
+  bridge_status_t status = BRIDGE_OK;
+  uint64_t rv;
+  // send master key to the enclave
+  if (SGX_SUCCESS != auth (global_eid, &rv, master_key)) {
+    status = BRIDGE_ER_INIT;
+    return status;
+  }
+  return status;
+}
+
+bridge_status_t
+br_file_valid (string filepath)
+{
+  bridge_status_t status = BRIDGE_OK;
+  struct stat     buffer;
+
+  if (filepath.substr (filepath.find_last_of (".") + 1) != DEFAULT_FILE_EXTENSION) {
+    status = BRIDGE_ER_WR_EXT;
+    return status;
+  }
+
+  if (stat (filepath.c_str (), &buffer) != 0) {
+    status = BRIDGE_ER_FILE_NONEX;
+    return status;
+  }
+
+  ifstream file (filepath);
+  uint8_t  magic[8] = {0x00};
+  file.read ((char *)&magic, SECPASS_MAGIC_SIZE);
+
+  if (magic[3] != SECPASS_MAGIC) {
+    status = BRIDGE_ER_WR_FILE;
+  }
+
+  return status;
+}
+
+void
+aes_256_cbc_encrypt (
+  uint8_t *key,
+  uint8_t *iv,
+  const string& ptext,
+  string& ctext
+  )
+{
+  EVP_CIPHER_CTX_ptr ctx (EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free);
+  int rc = EVP_EncryptInit_ex (ctx.get (), EVP_aes_256_cbc(), NULL, key, iv);
+  if (rc != 1) {
+    throw std::runtime_error ("aes_256_cbc_encrypt: EVP_EncryptInit_ex failed");
+  }
+
+  ctext.resize (ptext.size () + FILE_AES_BS);
+  int out_len1 = (int)ctext.size();
+
+    rc = EVP_EncryptUpdate(ctx.get (), (uint8_t*)&ctext[0], &out_len1, (const uint8_t*)&ptext[0], (int)ptext.size());
+    if (rc != 1) {
+      throw std::runtime_error ("aes_256_cbc_encrypt: EEVP_EncryptUpdate failed");
+    }
+
+    int out_len2 = (int) ctext.size () - out_len1;
+    rc = EVP_EncryptFinal_ex (ctx.get (), (uint8_t *)&ctext[0]+out_len1, &out_len2);
+    if (rc != 1) {
+      throw std::runtime_error ("aes_256_cbc_encrypt: EEVP_EncryptFinal_ex failed");
+    }
+
+    ctext.resize (out_len1 + out_len2);
+}
+
+void
+aes_256_cbc_decrypt (
+  uint8_t *key,
+  uint8_t *iv,
+  const string &ctext,
+  string& ptext
+  )
+{
+  EVP_CIPHER_CTX_ptr ctx (EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free);
+  int rc = EVP_DecryptInit_ex (ctx.get (), EVP_aes_256_cbc(), NULL, key, iv);
+  if (rc != 1) {
+    throw std::runtime_error ("aes_256_cbc_decrypt: EVP_DecryptInit_ex failed");
+  }
+
+  ptext.resize (ctext.size () + FILE_AES_BS);
+  int out_len1 = (int)ctext.size();
+
+    rc = EVP_DecryptUpdate (ctx.get (), (uint8_t*)&ptext[0], &out_len1, (const uint8_t*)&ctext[0], (int)ctext.size());
+    if (rc != 1) {
+      throw std::runtime_error ("aes_256_cbc_decrypt: EEVP_DecryptUpdate failed");
+    }
+
+    int out_len2 = (int) ptext.size () - out_len1;
+    rc = EVP_DecryptFinal_ex (ctx.get (), (uint8_t *)&ptext[0]+out_len1, &out_len2);
+    if (rc != 1) {
+      throw std::runtime_error ("aes_256_cbc_decrypt: EEVP_EncryptFinal_ex failed");
+    }
+
+    ptext.resize (out_len1 + out_len2);
+}
+
+void
+aes_256_cbc_handle_errors (void)
+{
+  ERR_print_errors_fp (stderr);
+  abort ();
 }

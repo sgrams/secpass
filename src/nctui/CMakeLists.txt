@@ -4,6 +4,7 @@
 ## secpass.org
 ## © 2019
 # check and set libncurses and SGX dependencies
+find_package(PkgConfig REQUIRED)
 set (CURSES_NEED_NCURSES TRUE)
 find_package (Curses REQUIRED)
 get_property (${PROJECT_NAME}_NC_SRC GLOBAL PROPERTY NC_SRC_LIST)
@@ -14,6 +15,10 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS}")
 # set DEBUG flags
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+
+# check for Argon2 KDF & OpenSSL
+find_package (Argon2 REQUIRED)
+find_package (OpenSSL REQUIRED)
 
 # include src dirs
 include_directories (
@@ -56,6 +61,8 @@ link_libraries (
   c
   stdc++
   ncurses
+  ${ARGON2_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
   -L${SGX_LIBRARY_PATH} ${SGX_URTS_LIB} ${SGX_USVC_LIB}
   )
 

@@ -62,6 +62,7 @@ Window::get_bool (string message, bool *to_be_closed)
         break;
       case 'n':
         *to_be_closed = false;
+        type = false;
         break;
       default:
         break;
@@ -75,6 +76,7 @@ Window::get_bool (string message, bool *to_be_closed)
 void
 Window::get_password (string message, string *buf)
 {
+  bool show_secret = false;
   bool type = true;
   int c = 0x00;
   noecho ();
@@ -85,7 +87,11 @@ Window::get_password (string message, string *buf)
     move (0, 0);
     wprintw (this->get_window (), "%s", message.c_str ());
     move (0, 1);
-    wprintw (this->get_window (), "%s", line.c_str ());
+    if (show_secret) {
+      wprintw (this->get_window (), "%s", buf->c_str ());
+    } else {
+      wprintw (this->get_window (), "%s", line.c_str ());
+    }
     draw ();
 
     switch (c = getch ()) {
@@ -105,6 +111,9 @@ Window::get_password (string message, string *buf)
         }
         break;
       case 27:
+        break;
+      case KEY_F(9):
+        show_secret = !show_secret;
         break;
       default:
         *buf += c;

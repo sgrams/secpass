@@ -9,8 +9,16 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
+
+#include <openssl/sha.h>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+
 #include "../core/core_u.h"
 #include "../core/core.h"
+#include "aes.h"
 
 #include "sgx_eid.h"
 #include "sgx_urts.h"
@@ -26,6 +34,8 @@ typedef uint8_t kdf_t;
 // enc_t: enum determining encryption function used
 typedef uint8_t enc_t;
 #define ENC_AES128GCM 0x00
+#define ENC_AES256CBC 0x01
+
 #define ENC_RESERVED  0xFF
 
 // bridge_status_t: 64 bit variable containing error code
@@ -43,12 +53,14 @@ typedef uint64_t bridge_status_t;
 #define BRIDGE_ER_WR_EXT     0x08
 #define BRIDGE_ER_FILE_INIT  0x09
 #define BRIDGE_ER_FILE_CLOSE 0x0A
+#define BRIDGE_ER_NOMEM      0x0B
+#define BRIDGE_ER_FILE_NONEX 0x0C
 #define BRIDGE_ER_UNDEF      0xFF
 
 // definitions of hash sizes and salt sizes
 #define KDF_SALT_SIZE 8  // 64 bit
-#define KDF_KEY_SIZE  16 // 256 bit
-#define KDF_KEYFILE_HASH_SIZE 16 // 256 bit
+#define KDF_KEY_SIZE  32 // 256 bit
+#define KDF_KEYFILE_HASH_SIZE 32 // 256 bit
 
 bridge_status_t
 br_enclave_init (void);
@@ -67,21 +79,23 @@ br_derive_key_argon2 (
   size_t     key_len    // IN
   );
 
+// file specific functions
 bridge_status_t
-br_file_check (string filepath);
+br_file_get_init (string filepath, bool file_new, uint8_t *salt, size_t salt_len);
 
 bridge_status_t
 br_file_exists (string filepath);
 
 bridge_status_t
-br_file_open (string master_key, string filepath);
+br_file_valid (string filepath);
 
 bridge_status_t
-br_file_save (string filepath);
+br_file_open (uint8_t *master_key, size_t master_key_len, string filepath);
 
 bridge_status_t
-br_file_create (string filepath, string master_key);
+br_file_save (string filepath, uint8_t *salt, size_t salt_len);
 
+// secret specific functions
 bridge_status_t
 br_secret_add (string name, string secret);
 
@@ -100,4 +114,23 @@ br_secret_fetch (string name, char *secret);
 bridge_status_t
 br_fetch_names (vector<string> *rv);
 
+// authorization (sending master key to enclave)
+bridge_status_t
+br_auth (uint8_t *master_key, size_t master_key_len);
+
+void
+aes_256_cbc_encrypt (
+  uint8_t *key,
+  uint8_t *iv,
+  const string &ptext,
+  string& ctext
+  );
+
+void
+aes_256_cbc_decrypt (
+  uint8_t *key,
+  uint8_t *iv,
+  const string &ctext,
+  string& ptext
+  );
 #endif // _SECPASS_COMMON_BRIDGE_H

@@ -26,36 +26,63 @@ int
 Ui::main_loop (int idle_time, string filepath, string key_filepath)
 {
   bool file_open = false;
+  bool file_new  = false;
+
   int status = 0;
   unsigned int pos = 0;
   uint8_t c;
-  string auth_key;
-  string master_key;
-
   vector<string> entries;
+  uint8_t salt[KDF_SALT_SIZE] = {0};
+  size_t  salt_len = KDF_SALT_SIZE;
+  string password;
 
+  uint8_t master_key[KDF_KEY_SIZE] = {0};
+  size_t  master_key_len = KDF_KEY_SIZE;
+
+  // initialize UI
   Draw::init ();
 
-  status = br_file_check (filepath);
-  if (BRIDGE_ER_WR_EXT == status) {
+  // open db file
+  status = br_file_valid (filepath);
+  if (BRIDGE_ER_WR_EXT == status ||
+      BRIDGE_ER_WR_FILE == status) {
     status = UI_ERR_FILE;
     goto MAIN_LOOP_EXIT;
+  } else if (BRIDGE_ER_FILE_NONEX == status) {
+    file_new = true;
+    printw ("File may be invalid. Creating new one.");
   }
 
-  Draw::draw_auth_popup (filepath, &auth_key);
+  br_file_get_init (filepath, file_new, salt, salt_len);
+  Draw::draw_auth_popup (filepath, &password);
 
-  // perform KDF if file provided
-  master_key = auth_key;
+  status = br_derive_key_argon2 (
+    password.c_str (),
+    br_file_exists (key_filepath) ? NULL : key_filepath.c_str (),
+    salt,
+    salt_len,
+    master_key,
+    master_key_len
+    );
 
-  if (BRIDGE_ER_WR_FILE == status) {
-    br_file_create (filepath, master_key); // create file if does not exist
+  // clear user input
+  password.clear ();
+  if (!file_new) {
+    status = br_file_open (master_key, master_key_len, filepath);
   }
 
-  status = br_file_open (master_key, filepath);
-  if (0 != status) {
+  if (status == BRIDGE_ER_FILE_INIT) {
+    printw ("Creating new file...");
+  } else if (-1 == status) {
     status = UI_ERR_FILE;
     goto MAIN_LOOP_EXIT;
+  } else {
   }
+
+  // send master key to the enclave
+  br_auth (master_key, master_key_len);
+  // clear master key after file opening
+  memset (master_key, 0, KDF_KEY_SIZE);
   file_open = true;
 
   // main loop
@@ -69,21 +96,21 @@ Ui::main_loop (int idle_time, string filepath, string key_filepath)
       goto MAIN_LOOP_EXIT;
     }
     // break main loop if quit issued
-    if (handle_input (filepath, entries, c, pos, entries.size ())) {
+    if (handle_input (filepath, salt, salt_len, entries, c, pos, entries.size ())) {
       break;
     }
   }
 
 MAIN_LOOP_EXIT:
   if (file_open) {
-    br_file_save (filepath);
+    br_file_save (filepath, salt, salt_len);
   }
   Draw::stop ();
   return status;
 }
 
 int
-Ui::handle_input (string filepath, vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements)
+Ui::handle_input (string filepath, uint8_t *salt, size_t salt_len, vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements)
 {
   static char secret[MAX_SECRET_LEN] = {0};
 
@@ -110,7 +137,7 @@ Ui::handle_input (string filepath, vector<string> entries, uint8_t c, unsigned i
       break;
 
     case SAVE_KEY:
-      br_file_save (filepath);
+      br_file_save (filepath, salt, salt_len);
       break;
 
     case REMOVE_KEY:
@@ -153,12 +180,14 @@ Ui::handle_input (string filepath, vector<string> entries, uint8_t c, unsigned i
       if (entries.size () > 0) {
         name_to_find = entries.at (pos);
         br_secret_fetch (name_to_find, secret);
-        curs_set (0);
-        Clipboard::cb_open ();
-        fprintf (stdout, "%s", secret);
-        Clipboard::cb_close ();
-        curs_set (1);
+        Clipboard::copy (secret);
+        printw ("Entry copied. Please press any key to wipe the clipboard and continue.");
+        timeout (CLIPBOARD_TIME * 1000); // convert time to ms
+        getch ();
+        Clipboard::copy ("");
         memset (secret, 0, MAX_SECRET_LEN);
+        Draw::stop ();
+        Draw::init ();
       }
       break;
 

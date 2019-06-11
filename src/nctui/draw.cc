@@ -125,6 +125,12 @@ Draw::stop ()
 }
 
 void
+Draw::print_message (const char *msg)
+{
+  title_window->print (string(msg), 0, 0);
+}
+
+void
 Draw::draw_auth_popup (string filepath, string *key) {
   int w = 50;
   int h = 10;
