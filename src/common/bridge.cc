@@ -301,6 +301,8 @@ br_file_open (uint8_t *master_key, size_t master_key_len, string filepath)
   memset (secret, 0, MAX_SECRET_SIZ);
   memset (iv, 0, iv_len);
 
+  ofstream lockfile (filepath + ".lockfile");
+  lockfile.close ();
   return status;
 }
 
@@ -449,6 +451,14 @@ br_file_valid (string filepath)
     status = BRIDGE_ER_WR_FILE;
   }
 
+  // check for lockfile
+  status = br_file_exists (filepath + ".lockfile");
+  if (status != 0) {
+    status = BRIDGE_OK;
+  } else {
+    // lockfile exists, cannot open the database
+    throw std::runtime_error ("br_file_valid: Cannot open file. It's already opened - check lockfile.");
+  }
   return status;
 }
 
@@ -508,7 +518,7 @@ aes_256_cbc_decrypt (
     int out_len2 = (int) ptext.size () - out_len1;
     rc = EVP_DecryptFinal_ex (ctx.get (), (uint8_t *)&ptext[0]+out_len1, &out_len2);
     if (rc != 1) {
-      throw std::runtime_error ("aes_256_cbc_decrypt: EEVP_EncryptFinal_ex failed");
+      throw std::runtime_error ("aes_256_cbc_decrypt: EEVP_DecryptFinal_ex failed. Master password might be wrong.");
     }
 
     ptext.resize (out_len1 + out_len2);

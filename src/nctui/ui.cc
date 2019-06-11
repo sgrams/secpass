@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <chrono>
 
 using namespace std;
@@ -104,6 +105,10 @@ Ui::main_loop (int idle_time, string filepath, string key_filepath)
 MAIN_LOOP_EXIT:
   if (file_open) {
     br_file_save (filepath, salt, salt_len);
+    if (br_file_exists (filepath + ".lockfile") == BRIDGE_OK) {
+      string lockfile_path = filepath + ".lockfile";
+      std::remove (lockfile_path.c_str ());
+    }
   }
   Draw::stop ();
   return status;
