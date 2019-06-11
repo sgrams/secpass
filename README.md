@@ -12,6 +12,8 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 ## Prerequisites
 ### Common
 - [Intel® SGX SDK](https://github.com/intel/linux-sgx)
+- OpenSSL
+- Argon2 library
 - CMake
 - GCC *or* Clang
 
