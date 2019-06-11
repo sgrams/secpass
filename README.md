@@ -14,8 +14,10 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 - [Intel® SGX SDK](https://github.com/intel/linux-sgx)
 - OpenSSL
 - Argon2 library
+- pkg-config
 - CMake
 - GCC *or* Clang
+- xclip (for TUI clipboard support)
 
 ### GUI/TUI
 - qt5 *OR* ncurses
@@ -35,8 +37,8 @@ $ ./build-qt.sh # for qt5 target
 
 Run with
 ```
-$ ./secpass-nc # for ncurses TUI
-$ ./secpass-qt # for qt5 GUI
+$ ./bin/secpass-nc # for ncurses TUI
+$ ./bin/secpass-qt # for qt5 GUI
 ```
 
 ## Documentation
