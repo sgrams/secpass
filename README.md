@@ -30,6 +30,8 @@ $ cd secpass/build/
 
 In order to build all targets (both ncurses and Qt front-end) please run
 ```
+$ cd build/
+
 $ ./build.sh    # for all available targets
 $ ./build-nc.sh # for ncurses target
 $ ./build-qt.sh # for qt5 target
@@ -37,8 +39,9 @@ $ ./build-qt.sh # for qt5 target
 
 Run with
 ```
-$ ./bin/secpass-nc # for ncurses TUI
-$ ./bin/secpass-qt # for qt5 GUI
+cd bin/
+$ ./secpass-nc # for ncurses TUI
+$ ./secpass-qt # for qt5 GUI
 ```
 
 ## Documentation
