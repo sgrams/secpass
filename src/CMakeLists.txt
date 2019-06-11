@@ -12,5 +12,4 @@ set (CMAKE_CXX_STANDARD 11)
 
 # add src subdirs
 add_subdirectory (core)
-add_subdirectory (qtgui)
 add_subdirectory (nctui)

@@ -18,9 +18,7 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 - CMake
 - GCC *or* Clang
 - xclip (for TUI clipboard support)
-
-### GUI/TUI
-- qt5 *OR* ncurses
+- ncurses
 
 ## Building secpass from source
 ```
@@ -28,20 +26,16 @@ $ git clone https://github.com/sgrams/secpass.git
 $ cd secpass/build/
 ```
 
-In order to build all targets (both ncurses and Qt front-end) please run
+Build the project with following commands:
 ```
 $ cd build/
+$ ./build.sh
+```
 
-$ ./build.sh    # for all available targets
-$ ./build-nc.sh # for ncurses target
-$ ./build-qt.sh # for qt5 target
-````
-
-Run with
+Run with:
 ```
 cd bin/
-$ ./secpass-nc # for ncurses TUI
-$ ./secpass-qt # for qt5 GUI
+$ ./secpass-nc
 ```
 
 ## Documentation
