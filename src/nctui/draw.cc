@@ -93,7 +93,7 @@ Draw::init ()
   details_window = new Window (start_x, start_y, width, height, "details");
   control_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "controls");
   delete_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "delete entry");
-  input_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "add entry");
+  input_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "set entry");
   find_window = new Window (input_start_x, input_start_y, COLS - input_start_x - 2, in_height, "find entry");
 
   return;
@@ -166,6 +166,16 @@ Draw::draw_new_entry (string *str, string *sec) {
 }
 
 void
+Draw::draw_edit_entry (string *str, string *sec, bool *to_be_set) {
+  input_window->clear ();
+  input_window->color (BORDER_COLOR_PAIR, true);
+  input_window->draw ();
+  input_window->get_input ("Editname of the secret", str);
+  input_window->get_concat_password ("Edit the secret", sec);
+  input_window->get_bool ("Are you sure you want to set this item?", to_be_set);
+}
+
+void
 Draw::draw_remove_entry (bool *to_be_closed) {
   input_window->clear ();
   input_window->color (BORDER_COLOR_PAIR, true);
@@ -202,9 +212,10 @@ draw_controls ()
 
   control_window->move(0, 1);
   line << "[" << ((unsigned char) NEW_KEY) << "] new secret : ";
+  line << "[" << ((unsigned char) EDIT_KEY) << "] edit secret : ";
   line << "[" << ((char) REMOVE_KEY) << "] delete selected : ";
   line << "[" << ((unsigned char) FIND_KEY) << "] find secret : ";
-  line << "[enter] show selected ";
+  line << "[enter] copy selected ";
   control_window->print(line.str());
   line.str("");
 
@@ -223,7 +234,7 @@ draw_entries (vector<string> entries, uint32_t selected)
     x_pos = 1;
     y_pos = 1;
 
-    size_t num_entries = height - 2;
+    size_t num_entries = height - 3;
     end_entry = entries.size ();
 
     if (end_entry > num_entries) {
@@ -231,7 +242,7 @@ draw_entries (vector<string> entries, uint32_t selected)
     }
 
     if (num_entries < entries.size ()) {
-      while (selected > end_entry + list_offset - 2 && selected != 0) {
+      while (selected > (end_entry + list_offset - 2) && selected != 0) {
         list_offset++;
       }
       while (selected < start_entry + list_offset && selected != entries.size () - 1)

@@ -127,6 +127,62 @@ Window::get_password (string message, string *buf)
 }
 
 void
+Window::get_concat_password (string message, string *buf)
+{
+  bool show_secret = false;
+  bool type = true;
+  int c = 0x00;
+  noecho ();
+
+  string line;
+  for (size_t i = 0; i < buf->length (); i++)
+  {
+    line += ".";
+  }
+
+  while (type) {
+    move (0, 0);
+    wprintw (this->get_window (), "%s", message.c_str ());
+    move (0, 1);
+    if (show_secret) {
+      wprintw (this->get_window (), "%s", buf->c_str ());
+    } else {
+      wprintw (this->get_window (), "%s", line.c_str ());
+    }
+    draw ();
+
+    switch (c = getch ()) {
+      case '\n':
+        if (buf->length () > 0) {
+          type = false;
+          break;
+        }
+        continue;
+        break;
+      case 127:
+      case 0x08:
+      case KEY_BACKSPACE:
+        if (buf->length () > 0 && line.length () > 0) {
+          buf->resize (buf->length () - 1);
+          line.resize (line.length () - 1);
+        }
+        break;
+      case 27:
+        break;
+      case KEY_F(9):
+        show_secret = !show_secret;
+        break;
+      default:
+        *buf += c;
+        line += ".";
+        break;
+    }
+  }
+
+  c = 0;
+  return;
+}
+void
 Window::get_input (string message, string *buf)
 {
   bool type = true;

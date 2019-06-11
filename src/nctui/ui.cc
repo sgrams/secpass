@@ -123,6 +123,7 @@ Ui::handle_input (string filepath, uint8_t *salt, size_t salt_len, vector<string
   std::string new_secret;
   std::string name_to_find;
   bool to_be_deleted;
+  bool to_be_set;
   noecho ();
 
   switch (c) {
@@ -130,6 +131,9 @@ Ui::handle_input (string filepath, uint8_t *salt, size_t salt_len, vector<string
       return 1;
 
     case NEW_KEY:
+      if (entries.size () > MAX_SECRETS) {
+        break;
+      }
       Draw::draw_new_entry (&new_secret_name, &new_secret);
       if (new_secret_name.size () > MAX_NAME_LEN) {
         new_secret_name.resize (MAX_NAME_LEN);
@@ -139,6 +143,37 @@ Ui::handle_input (string filepath, uint8_t *salt, size_t salt_len, vector<string
       }
 
       br_secret_add (new_secret_name, new_secret);
+      new_secret.clear ();
+      break;
+
+    case EDIT_KEY:
+      if (entries.size () > 0) {
+        // find secret name
+        name_to_find = entries.at (pos);
+        new_secret_name = name_to_find;
+
+        // retrieve secret
+        br_secret_fetch (name_to_find, secret);
+        new_secret = string (secret);
+
+        // get input data
+        Draw::draw_edit_entry (&new_secret_name, &new_secret, &to_be_set);
+
+        if (to_be_set == true) {
+          if (new_secret_name.size () > MAX_NAME_LEN) {
+            new_secret_name.resize (MAX_NAME_LEN);
+          }
+          if (new_secret.size () > MAX_SECRET_LEN) {
+            new_secret.resize (MAX_SECRET_LEN);
+          }
+          // remove old
+          br_secret_del (name_to_find);
+          // add new
+          br_secret_add (new_secret_name, new_secret);
+        }
+      }
+      memset (secret, 0, MAX_SECRET_LEN);
+      new_secret.clear ();
       break;
 
     case SAVE_KEY:
@@ -194,6 +229,7 @@ Ui::handle_input (string filepath, uint8_t *salt, size_t salt_len, vector<string
         Draw::stop ();
         Draw::init ();
       }
+      memset (secret, 0, MAX_SECRET_LEN);
       break;
 
     case RESIZE_KEY:
