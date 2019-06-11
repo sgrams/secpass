@@ -34,7 +34,7 @@ $ ./build.sh
 
 Run with:
 ```
-cd bin/
+$ cd bin/
 $ ./secpass-nc
 ```
 
