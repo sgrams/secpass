@@ -47,13 +47,10 @@ Thumbs.db
 *.so
 *.o
 secpass-nc
-secpass-qt
 
 # Build apart from build scripts
 build/*
 !build/build.sh
-!build/build-nc.sh
-!build/build-qt.sh
 
 # Docs apart from doxygen config
 docs/*
