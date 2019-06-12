@@ -47,7 +47,7 @@ core_status_t
 get_salt (uint8_t *salt, size_t len)
 {
   core_status_t status = CORE_OK;
-  if (!salt || len <= 0) {
+  if (!salt || !len) {
     status = CORE_ER_WR_PARAM;
     return status;
   }

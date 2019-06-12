@@ -26,7 +26,7 @@ class Window {
 		string name;
 
   public:
-    Window (uint32_t x, uint32_t y, uint32_t width, uint32_t height, string name, bool border = 1);
+    Window (uint32_t x, uint32_t y, uint32_t width, uint32_t height, const string name, bool border = 1);
     ~Window ();
 
     static void set_colors (bool colors);

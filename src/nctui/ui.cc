@@ -33,7 +33,7 @@ Ui::main_loop (int idle_time, string filepath, string key_filepath)
   unsigned int pos = 0;
   uint8_t c;
   vector<string> entries;
-  uint8_t salt[KDF_SALT_SIZE] = {0};
+  uint8_t salt[KDF_SALT_SIZE];
   size_t  salt_len = KDF_SALT_SIZE;
   string password;
 
@@ -97,7 +97,7 @@ Ui::main_loop (int idle_time, string filepath, string key_filepath)
       goto MAIN_LOOP_EXIT;
     }
     // break main loop if quit issued
-    if (handle_input (filepath, salt, salt_len, entries, c, pos, entries.size ())) {
+    if (handle_input (filepath, salt, salt_len, (const vector<string>)entries, c, pos, entries.size ())) {
       break;
     }
   }

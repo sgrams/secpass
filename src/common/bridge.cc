@@ -51,12 +51,6 @@ br_derive_key_argon2 (const char *password, const char *filepath, uint8_t *salt,
   size_t  source_len;
   uint8_t *source       = NULL;
   uint8_t *file_hash    = NULL;
-  uint8_t *derived_hash = NULL;
-
-  derived_hash = (uint8_t *)malloc (KDF_KEY_SIZE); // 256 bit
-  if (!derived_hash) {
-    return BRIDGE_ER_NOMEM;
-  }
 
   if (filepath != NULL) {
     FILE *fp = fopen (filepath, "rb");
@@ -122,7 +116,7 @@ br_derive_key_argon2 (const char *password, const char *filepath, uint8_t *salt,
 }
 
 bridge_status_t
-br_secret_add (string name, string secret)
+br_secret_add (const string name, const string secret)
 {
   uint64_t rv;
   uint8_t  sc;
@@ -153,7 +147,7 @@ br_secret_set (char *name, size_t name_len, char *secret, size_t secret_len)
 }
 
 bridge_status_t
-br_secret_del (string name)
+br_secret_del (const string name)
 {
   uint64_t rv;
   bridge_status_t status = BRIDGE_OK;
@@ -171,7 +165,7 @@ br_secret_del (string name)
 }
 
 bridge_status_t
-br_secret_check (string name, uint8_t *rv) {
+br_secret_check (const string name, uint8_t *rv) {
   uint64_t rs;
   const char *str = name.c_str ();
 
@@ -182,7 +176,7 @@ br_secret_check (string name, uint8_t *rv) {
 }
 
 bridge_status_t
-br_secret_fetch (string name, char *secret)
+br_secret_fetch (const string name, char *secret)
 {
   uint64_t rv;
   const char *str = name.c_str ();
@@ -204,7 +198,7 @@ br_fetch_names (vector<string> *rv)
 
 // file-specific methods
 bridge_status_t
-br_file_check (string filepath)
+br_file_check (const string filepath)
 {
   bridge_status_t status = BRIDGE_OK;
 
@@ -217,7 +211,7 @@ br_file_check (string filepath)
 }
 
 bridge_status_t
-br_file_exists (string filepath)
+br_file_exists (const string filepath)
 {
   bridge_status_t status = BRIDGE_OK;
   ifstream file;
@@ -233,7 +227,7 @@ br_file_exists (string filepath)
 }
 
 bridge_status_t
-br_file_open (uint8_t *master_key, size_t master_key_len, string filepath)
+br_file_open (uint8_t *master_key, size_t master_key_len, const string filepath)
 {
   uint64_t rv;
 
@@ -307,7 +301,7 @@ br_file_open (uint8_t *master_key, size_t master_key_len, string filepath)
 }
 
 bridge_status_t
-br_file_save (string filepath, uint8_t *salt, size_t salt_len)
+br_file_save (const string filepath, uint8_t *salt, size_t salt_len)
 {
   uint64_t rv;
   bridge_status_t status = BRIDGE_OK;
@@ -381,7 +375,7 @@ br_file_save (string filepath, uint8_t *salt, size_t salt_len)
 }
 
 bridge_status_t
-br_file_get_init (string filepath, bool file_new, uint8_t *salt, size_t salt_len)
+br_file_get_init (const string filepath, bool file_new, uint8_t *salt, size_t salt_len)
 {
   uint64_t rv;
   bridge_status_t status = BRIDGE_OK;
@@ -428,7 +422,7 @@ br_auth (uint8_t *master_key, size_t master_key_len)
 }
 
 bridge_status_t
-br_file_valid (string filepath)
+br_file_valid (const string filepath)
 {
   bridge_status_t status = BRIDGE_OK;
   struct stat     buffer;
@@ -522,11 +516,4 @@ aes_256_cbc_decrypt (
     }
 
     ptext.resize (out_len1 + out_len2);
-}
-
-void
-aes_256_cbc_handle_errors (void)
-{
-  ERR_print_errors_fp (stderr);
-  abort ();
 }

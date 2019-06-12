@@ -14,7 +14,7 @@ using namespace std;
 
 bool Window::colors;
 
-Window::Window (uint32_t x, uint32_t y, uint32_t width, uint32_t height, string name, bool border)
+Window::Window (uint32_t x, uint32_t y, uint32_t width, uint32_t height, const string name, bool border)
 {
   this->x = x;
   this->y = y;
@@ -306,12 +306,6 @@ Window::color_off (int pair, bool border)
   else {
     wattroff (this->win, COLOR_PAIR(pair));
   }
-}
-
-bool
-Window::mouse (int &x, int &y)
-{
- return wmouse_trafo (win, &y, &x, false);
 }
 
 WINDOW*
