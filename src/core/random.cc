@@ -116,7 +116,6 @@ core_status_t
 core_random_c::get_u64_seed (uint64_t *seed)
 {
 #ifdef COMPILER_HAS_RDSEED_SUPPORT
-  core_status_t status = CORE_OK;
   uint32_t retries = DRNG_DEF_RETRIES;
 
   if (!get_rng_support ()) {
