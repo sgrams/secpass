@@ -26,7 +26,7 @@ class Window {
 		string name;
 
   public:
-    Window (uint32_t x, uint32_t y, uint32_t width, uint32_t height, const string name, bool border = 1);
+    Window (uint32_t x, uint32_t y, uint32_t width, uint32_t height, const string &name, bool border = 1);
     ~Window ();
 
     static void set_colors (bool colors);
@@ -36,8 +36,8 @@ class Window {
 
     void move (uint32_t x, uint32_t y);
 
-    void print (string text);
-    void print (string text, uint32_t x, uint32_t y);
+    void print (const string &text);
+    void print (const string &text, uint32_t x, uint32_t y);
 
     void invert (bool border = 0);
     void revert (bool border = 0);
@@ -49,9 +49,9 @@ class Window {
 
     WINDOW *get_window ();
 
-    void get_password (string message, string *buf);
-    void get_concat_password (string message, string *buf);
-    void get_input    (string message, string *buf);
-    void get_bool (string message, bool *to_be_closed);
+    void get_password (const string &message, string *buf);
+    void get_concat_password (const string &message, string *buf);
+    void get_input    (const string &message, string *buf);
+    void get_bool (const string &message, bool *to_be_closed);
 };
 #endif // _SECPASS_NCTUI_WINDOW_H

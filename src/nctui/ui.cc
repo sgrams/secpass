@@ -24,7 +24,7 @@
 using namespace std;
 
 int
-Ui::main_loop (int idle_time, string filepath, string key_filepath)
+Ui::main_loop (int idle_time, const string &filepath, const string &key_filepath)
 {
   bool file_open = false;
   bool file_new  = false;
@@ -37,7 +37,7 @@ Ui::main_loop (int idle_time, string filepath, string key_filepath)
   size_t  salt_len = KDF_SALT_SIZE;
   string password;
 
-  uint8_t master_key[KDF_KEY_SIZE] = {0};
+  uint8_t master_key[KDF_KEY_SIZE];
   size_t  master_key_len = KDF_KEY_SIZE;
 
   // initialize UI
@@ -117,7 +117,7 @@ MAIN_LOOP_EXIT:
 int
 Ui::handle_input (string filepath, uint8_t *salt, size_t salt_len, vector<string> entries, uint8_t c, unsigned int &pos, unsigned int elements)
 {
-  static char secret[MAX_SECRET_LEN] = {0};
+  static char secret[MAX_SECRET_LEN];
 
   std::string new_secret_name;
   std::string new_secret;

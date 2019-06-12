@@ -14,7 +14,7 @@ using namespace std;
 
 bool Window::colors;
 
-Window::Window (uint32_t x, uint32_t y, uint32_t width, uint32_t height, const string name, bool border)
+Window::Window (uint32_t x, uint32_t y, uint32_t width, uint32_t height, const string &name, bool border)
 {
   this->x = x;
   this->y = y;
@@ -38,7 +38,7 @@ Window::~Window ()
 }
 
 void
-Window::get_bool (string message, bool *to_be_closed)
+Window::get_bool (const string &message, bool *to_be_closed)
 {
   char c;
   noecho ();
@@ -74,7 +74,7 @@ Window::get_bool (string message, bool *to_be_closed)
 }
 
 void
-Window::get_password (string message, string *buf)
+Window::get_password (const string &message, string *buf)
 {
   bool show_secret = false;
   bool type = true;
@@ -127,7 +127,7 @@ Window::get_password (string message, string *buf)
 }
 
 void
-Window::get_concat_password (string message, string *buf)
+Window::get_concat_password (const string &message, string *buf)
 {
   bool show_secret = false;
   bool type = true;
@@ -183,7 +183,7 @@ Window::get_concat_password (string message, string *buf)
   return;
 }
 void
-Window::get_input (string message, string *buf)
+Window::get_input (const string &message, string *buf)
 {
   bool type = true;
   int c = 0x00;
@@ -254,13 +254,13 @@ Window::move (uint32_t x, uint32_t y)
 }
 
 void
-Window::print (string text)
+Window::print (const string &text)
 {
   wprintw (win, text.c_str());
 }
 
 void
-Window::print (string text, uint32_t x, uint32_t y)
+Window::print (const string &text, uint32_t x, uint32_t y)
 {
   mvwprintw (win, y, x, text.c_str ());
 }
