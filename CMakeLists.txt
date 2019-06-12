@@ -48,4 +48,3 @@ function (add_src_files list)
 endfunction (add_src_files)
 
 add_subdirectory (src)
-#add_subdirectory (test)
