@@ -23,7 +23,7 @@ and notes in secret memory enclaves – hence "sec" in secpass.
 ## Building secpass from source
 ```
 $ git clone https://github.com/sgrams/secpass.git
-$ cd secpass/build/
+$ cd secpass/
 ```
 
 Build the project with following commands:
