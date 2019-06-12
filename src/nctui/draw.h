@@ -53,8 +53,8 @@ const uint8_t COPY_KEY   = (uint8_t)'\n';
 // namespace with window-drawing functions
 namespace Draw {
   void init ();
-  void draw (vector<string> entries, const string filepath, uint32_t selected);
-  void draw_auth_popup (const string filepath, string *key);
+  void draw (vector<string> entries, const string &filepath, uint32_t selected);
+  void draw_auth_popup (const string &filepath, string *key);
   void draw_find_entry (string *str);
   void draw_new_entry (string *str, string *sec);
   void draw_edit_entry (string *str, string *sec, bool *to_be_closed);

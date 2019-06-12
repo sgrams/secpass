@@ -18,9 +18,9 @@ using namespace std;
 
 // prototypes
 string
-create_title (const string filepath);
+create_title (const string &filepath);
 void
-draw_title (const string filepath);
+draw_title (const string &filepath);
 void
 draw_controls ();
 void
@@ -100,7 +100,7 @@ Draw::init ()
 }
 
 void
-Draw::draw (vector<string> entries, const string filepath, uint32_t selected)
+Draw::draw (vector<string> entries, const string &filepath, uint32_t selected)
 {
   draw_title (filepath);
   draw_controls ();
@@ -131,7 +131,7 @@ Draw::print_message (const char *msg)
 }
 
 void
-Draw::draw_auth_popup (const string filepath, string *key) {
+Draw::draw_auth_popup (const string &filepath, string *key) {
   int w = 50;
   int h = 10;
   int x = (COLS  - w) / 2;
@@ -184,7 +184,7 @@ Draw::draw_remove_entry (bool *to_be_closed) {
 }
 
 void
-draw_title (const string filepath)
+draw_title (const string &filepath)
 {
   title_window->clear ();
   title_window->invert ();
@@ -307,9 +307,9 @@ draw_entries (vector<string> entries, uint32_t selected)
 }
 
 string
-create_title (const string filepath)
+create_title (const string &filepath)
 {
-  string title = "[ secpass " + (const string)SECPASS_VERSION + " ]";
+  string title = "/ secpass " + (const string &)SECPASS_VERSION + " / ";
 
   uint32_t tmp = (COLS - filepath.size () - 2) / 2;
 

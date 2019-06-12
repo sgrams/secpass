@@ -127,7 +127,7 @@ br_secret_add (const string &name, const string &secret)
   }
 
   const char *str = name.c_str ();
-  char sec[MAX_SECRET_LEN] = {0};
+  char sec[MAX_SECRET_LEN];
   strncpy (sec, secret.c_str (), secret.size () + 1);
 
   if (SGX_SUCCESS != entry_add (global_eid, &rv, str, sec)) {
