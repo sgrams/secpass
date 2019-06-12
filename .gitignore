@@ -52,6 +52,10 @@ secpass-nc
 build/*
 !build/build.sh
 
+# Bin apart from gitkeep
+bin/*
+!bin/.gitkeep
+
 # Docs apart from doxygen config
 docs/*
 !docs/secpass.doxy
