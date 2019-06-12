@@ -51,6 +51,7 @@ secpass-nc
 # Build apart from build scripts
 build/*
 !build/build.sh
+!build/build-hw.sh
 
 # Bin apart from gitkeep
 bin/*
