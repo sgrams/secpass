@@ -1,6 +1,4 @@
-# secpass: password manager powered by Intel® SGX
-<img style="text-center;" src="https://raw.githubusercontent.com/sgrams/secpass/master/assets/logo/logo.png" alt="logo" width="100"/>
-
+# secpass: PoC password manager powered by Intel® SGX
 *secpass* is a password manager being created for people who value their privacy. \
 By utilizing Intel® Software Guard Extensions, secpass is meant to protect your passwords
 and notes in secret memory enclaves – hence "sec" in secpass.
@@ -38,10 +36,7 @@ $ ./secpass-nc
 ```
 
 ## Documentation
-Documentation is available under [docs.secpass.org](https://docs.secpass.org/) and is dynamically
-generated with Doxygen.
-
-In order to generate docs please run
+In order to generate html/pdf/tex documentation please run
 ```
 $ cd docs/ && doxygen secpass.doxy
 ```
