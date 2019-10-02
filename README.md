@@ -1,7 +1,5 @@
 # secpass: PoC password manager powered by Intel® SGX
-*secpass* is a password manager being created for people who value their privacy. \
-By utilizing Intel® Software Guard Extensions, secpass is meant to protect your passwords
-and notes in secret memory enclaves – hence "sec" in secpass.
+By utilizing Intel® Software Guard Extensions, secpass is meant to protect your secrets in encrypted memory enclaves
 
 ## Build status
 [![CircleCI](https://circleci.com/gh/sgrams/secpass/tree/master.svg?style=svg)](https://circleci.com/gh/sgrams/secpass/tree/master)
